@@ -4,7 +4,7 @@ COPY ["MoodTracker-back.csproj", "./"]
 RUN dotnet restore
 
 COPY . .
-RUN dotnet publish -c Release -o /app/publish
+RUN dotnet publish MoodTracker-back.csproj -c Release -o /app/publish
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0.1
 WORKDIR /app

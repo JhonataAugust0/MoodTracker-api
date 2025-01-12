@@ -43,3 +43,7 @@ publish/
 app/
 
 Migrations/
+./appsettings.Development.json
+./appsettings.json
+appsettings.Development.json
+appsettings.json

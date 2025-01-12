@@ -25,23 +25,23 @@ O MoodTracker é uma aplicação projetada para ajudar os usuários a rastrear e
 
 | ID     | Descrição do Requisito                                                                                                                        | Prioridade | 
 |--------|-----------------------------------------------------------------------------------------------------------------------------------------------|------------| 
-| RF-001 | A API deve permitir o registro do usuário com email e senha.	                                                                              | Alta       |
-| RF-002 | A API deve gerar um SALT aleatório para armazenar o hash da senha do usuário	                                                              | Alta       |
+| RF-001 | A API deve permitir o registro do usuário com email e senha.	                                                                                 | Alta       |
+| RF-002 | A API deve gerar um SALT aleatório para armazenar o hash da senha do usuário	                                                                 | Alta       |
 | RF-003 | A API deve exigir autenticação JWT usando o email e senha do usuário com criptografia SHA-256 para acessar a área do dashboard                | Alta       |
 | RF-004 | A API deve implementar refresh token para manter a sessão do usuário.                                                                         | Alta       |
 | RF-005 | A API deve fornecer ao usuário a possibilidade de alterar sua senha em caso de esquecimento enviando um link de recuperação ao email do mesmo | Alta       | 
-| RF-006 | A API deve permitir o encerramento da sessão do usuário.	                                                                                  | Alta       |
-| RF-007 | A API deve permitir o registro de humor diário.	                                                                                              | Alta       |
-| RF-008 | A API deve permitir múltiplos registros de humor por dia.	                                                                                  | Alta       |
-| RF-009 | A API deve permitir adição de notas ao registro de humor	                                                                                  | Alta       |
-| RF-010 | A API deve permitir a visualização do histórico do registro de humor	                                                                      | Alta       |
-| RF-011 | A API deve permitir o gerenciamento de hábitos (criar, editar, excluir).	                                                                  | Alta       |
-| RF-012 | A API deve permitir o registro da realização de hábitos.		                                                                              | Alta       |
-| RF-013 | A API deve permitir a visualização do histórico da realização de hábitos	                                                                  | Alta       |
-| RF-014 | A API deve permitir criar, editar, excluir tags	                                                                           | Alta       |
-| RF-015 | A API deve permitir a associação de hábitos com tags                                                                           | Alta       |
-| RF-016 | A API deve oferecer a visualização de calendário interativo para visualização de dados (humor, hábitos).	| Alta       |
-| RF-017 | A API deve permitir a criação, edição e exclusão de notas rápidas.	                                                                           | Alta       |
+| RF-006 | A API deve permitir o encerramento da sessão do usuário.	                                                                                     | Alta       |
+| RF-007 | A API deve permitir o registro de humor diário.	                                                                                             | Alta       |
+| RF-008 | A API deve permitir múltiplos registros de humor por dia.	                                                                                 | Alta       |
+| RF-009 | A API deve permitir adição de notas ao registro de humor	                                                                                     | Alta       |
+| RF-010 | A API deve permitir a visualização do histórico do registro de humor	                                                                         | Alta       |
+| RF-011 | A API deve permitir o gerenciamento de hábitos (criar, editar, excluir).	                                                                     | Alta       |
+| RF-012 | A API deve permitir o registro da realização de hábitos.		                                                                                 | Alta       |
+| RF-013 | A API deve permitir a visualização do histórico da realização de hábitos	                                                                     | Alta       |
+| RF-014 | A API deve permitir criar, editar, excluir tags	                                                                                             | Alta       |
+| RF-015 | A API deve permitir a associação de hábitos com tags                                                                                          | Alta       |
+| RF-016 | A API deve oferecer a visualização de calendário interativo para visualização de dados (humor, hábitos).	                                     | Alta       |
+| RF-017 | A API deve permitir a criação, edição e exclusão de notas rápidas.	                                                                         | Alta       |                                                                     | Alta       |
 
 ## Requisitos não Funcionais
 
