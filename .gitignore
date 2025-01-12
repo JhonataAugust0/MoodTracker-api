@@ -41,3 +41,5 @@ Thumbs.db
 publish/
 ./publish/
 app/
+
+Migrations/

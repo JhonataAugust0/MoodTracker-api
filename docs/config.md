@@ -14,9 +14,8 @@ dotnet new webapi -n MoodTracker
 ```
 bash
 dotnet add package Microsoft.EntityFrameworkCore
-dotnet add package Microsoft.EntityFrameworkCore.SqlServer
+dotnet add package Microsoft.EntityFrameworkCore.PostgreSQL
 dotnet add package Microsoft.EntityFrameworkCore.Tools
-dotnet add package Swashbuckle.AspNetCore
 ```
 
 3. Para rodar a aplicação:

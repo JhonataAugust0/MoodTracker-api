@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace MoodTracker_back.Controllers;
+namespace MoodTracker_back.Presentation.Controllers;
 
 [ApiController]
 [Route("[controller]")]

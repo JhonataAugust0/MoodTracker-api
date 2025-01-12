@@ -1,4 +1,16 @@
+using DotNetEnv;
+using Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
+
+DotNetEnv.Env.Load();
+
+var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING") ?? 
+                       builder.Configuration.GetConnectionString("DefaultConnection");
+
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseNpgsql(connectionString));
 
 builder.Services.AddHealthChecks();
 builder.Services.AddControllers();
@@ -11,6 +23,16 @@ builder.WebHost.ConfigureKestrel(options =>
 });
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    
+    if (dbContext.Database.GetPendingMigrations().Any())
+    {
+        dbContext.Database.Migrate();
+    }
+}
 
 if (app.Environment.IsDevelopment())
 {
