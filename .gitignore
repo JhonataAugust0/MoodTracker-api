@@ -1,0 +1,43 @@
+# Build artifacts
+bin/
+obj/
+*.dll
+*.exe
+*.pdb
+
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Rider and IntelliJ IDEA files
+.idea/
+
+# Visual Studio files
+.vs/
+
+# VS Code files
+.vscode/
+
+# Logs
+*.log
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Environment files
+.env
+.env.*.local
+
+# Rider files
+*.idea/
+./idea/
+./bin/
+./obj/
+./out/
+publish/
+./publish/
+app/
