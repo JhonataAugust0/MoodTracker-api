@@ -7,7 +7,7 @@ using MoodTracker_back.Presentation.Api.V1.Dtos;
 namespace MoodTracker_back.Presentation.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/moods")]
     [Authorize]
     public class MoodController : ControllerBase
     {

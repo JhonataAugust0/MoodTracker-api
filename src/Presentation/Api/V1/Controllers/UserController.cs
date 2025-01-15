@@ -6,34 +6,39 @@ using MoodTracker_back.Presentation.Api.V1.Dtos;
 namespace MoodTracker_back.Presentation.Controllers
 {
   [ApiController]
-  [Route("api/[controller]")]
+  [Route("api/users")]
   public class UserController : ControllerBase
 
   {
     private readonly IUserService _userService;
+    private readonly ICurrentUserService _currentUserService;
 
-    public UserController( IUserService userService)
+    public UserController(IUserService userService, ICurrentUserService currentUserService)
     {
       _userService = userService;
+      _currentUserService = currentUserService;
     }
 
-    [HttpPost("register")]
+    [HttpPost()]
     public async Task<IActionResult> Register([FromBody] RegisterRequestDTO request)
     {
       var result = await _userService.RegisterUserAsync(request.Email, request.Password, request.Name);
-      // if (result.Email != Nullable && result.Name)
-      // {
-      //   return BadRequest(result.Error);
-      // }
       return Ok(result);
     }
 
-  //   [HttpDelete("delete")]
-  //   [Authorize]
-  //   public async Task<IActionResult> DeleteUser([FromBody] LogoutRequestDTO request)
-  //   {
-  //     var result = await _authService.RevokeTokenAsync(request.RefreshToken);
-  //     return Ok(new { success = result });
-  //   }
+    [HttpDelete()]
+    [Authorize]
+    public async Task<IActionResult> DeleteUser()
+    {
+      var user = _currentUserService.UserId;
+      if (user == null)
+      {
+        return Unauthorized("User ID not found in token.");
+      }
+
+      await _userService.DeleteUserAsync(user);
+      return Ok("User deleted successfully");
+
+    }
   }
 }

@@ -63,4 +63,15 @@ public class UserService : IUserService
     {
         await _userRepository.UpdateAsync(user);
     }
+    
+    public async Task DeleteUserAsync(int id)
+    {
+        var user = await _userRepository.GetByIdAsync(id);
+        if (user == null)
+        {
+            throw new NotFoundException("User not found");
+        };
+            
+        await _userRepository.DeleteAsync(user);
+    }
 }

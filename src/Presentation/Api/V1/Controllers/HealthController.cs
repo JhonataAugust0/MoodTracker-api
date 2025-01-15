@@ -5,7 +5,7 @@ namespace MoodTracker_back.Presentation.Controllers
 {
     [Authorize]
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/health")]
     public class HealthController : ControllerBase
     {
         [HttpGet]

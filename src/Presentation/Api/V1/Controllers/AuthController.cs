@@ -40,7 +40,7 @@ namespace MoodTracker_back.Presentation.Controllers
       return Ok(result);
     }
     
-    [HttpPost("logout")]
+    [HttpDelete("session")]
     [Authorize]
     public async Task<IActionResult> Logout([FromBody] LogoutRequestDTO request)
     {

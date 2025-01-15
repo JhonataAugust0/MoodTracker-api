@@ -10,4 +10,5 @@ public interface IUserService
     Task<User?> GetUserByRefreshTokenAsync(string refreshToken);
     Task<bool> EmailExistsAsync(string email);
     Task UpdateUserAsync(User user);
+    Task DeleteUserAsync(int id);
 }

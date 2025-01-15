@@ -6,26 +6,25 @@ using MoodTracker_back.Presentation.Api.V1.Dtos;
 namespace MoodTracker_back.Presentation.Controllers
 {
   [ApiController]
-  [Route("api/[controller]")]
+  [Route("api/password")]
   public class PasswordController : ControllerBase
 
   {
     private readonly IPasswordService _passwordService;
-    private readonly IUserService _userService;
 
     public PasswordController(IPasswordService passwordService)
     {
       _passwordService = passwordService;
     }
 
-    [HttpPost("forgot-password")]
+    [HttpPost("forgot")]
     public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequestDTO request)
     {
       var result = await _passwordService.RequestPasswordResetAsync(request.Email);
       return Ok(new { success = result });
     }
 
-    [HttpPost("reset-password")]
+    [HttpPost("reset")]
     [Authorize]
     public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
     {

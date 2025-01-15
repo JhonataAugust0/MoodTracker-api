@@ -52,14 +52,10 @@ public class UserRepository : IUserRepository
         return await _context.Users.AnyAsync(u => u.Email == email);
     }
     
-    public async Task DeleteAsync(int id)
+    public async Task DeleteAsync(User user)
     {
-        var user = await _context.Users.FindAsync(id);
-        if (user is not null)
-        {
-            _context.Users.Remove(user);
-            await _context.SaveChangesAsync();
-        }
+        _context.Users.Remove(user);
+        await _context.SaveChangesAsync();
     }
 
     public async Task<IEnumerable<User>> GetAllAsync()
