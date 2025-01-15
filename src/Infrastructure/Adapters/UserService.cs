@@ -1,6 +1,6 @@
 using Domain.Entities;
 using Domain.Interfaces;
-using MoodTracker_back.Application.Exceptions;
+using MoodTracker_back.Infrastructure.Exceptions;
 using MoodTracker_back.Application.Services;
 
 namespace MoodTracker_back.Infrastructure.Adapters;

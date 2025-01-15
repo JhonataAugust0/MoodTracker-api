@@ -1,4 +1,4 @@
-namespace MoodTracker_back.Application.Exceptions;
+namespace MoodTracker_back.Infrastructure.Exceptions;
 
 public class NotFoundException : Exception
 {

@@ -1,7 +1,7 @@
 using System.Globalization;
 using Domain.Entities;
 using Domain.Interfaces;
-using MoodTracker_back.Application.Exceptions;
+using MoodTracker_back.Infrastructure.Exceptions;
 using MoodTracker_back.Application.Services;
 using MoodTracker_back.Presentation.Api.V1.Dtos;
 
