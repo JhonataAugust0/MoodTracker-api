@@ -1,10 +1,10 @@
-using Application.Services;
-
-namespace Infrastructure.Adapters;
-
 using System.Net;
 using System.Net.Mail;
 using Microsoft.Extensions.Options;
+using MoodTracker_back.Application.Services;
+
+namespace MoodTracker_back.Infrastructure.Adapters;
+
 
 public class EmailSettings
 {

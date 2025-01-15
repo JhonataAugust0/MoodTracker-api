@@ -3,7 +3,7 @@ using Domain.Interfaces;
 using Infrastructure.Data.Config;
 using Microsoft.EntityFrameworkCore;
 
-namespace Infrastructure.Data.Repositories;
+namespace MoodTracker_back.Infrastructure.Data.Repositories;
 
 public class UserRepository : IUserRepository
 {
@@ -26,6 +26,13 @@ public class UserRepository : IUserRepository
         return await _context.Users
             .Include(u => u.RefreshTokens)
             .FirstOrDefaultAsync(u => u.Id == id);
+    }
+    
+    public async Task<User?> GetUserByRefreshTokenAsync(string refreshToken)
+    {
+        return await _context.Users
+            .Include(u => u.RefreshTokens)
+            .FirstOrDefaultAsync(u => u.RefreshTokens.Any(rt => rt.Token == refreshToken));
     }
 
     public async Task CreateAsync(User user)

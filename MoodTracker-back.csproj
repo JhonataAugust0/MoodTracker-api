@@ -38,5 +38,4 @@
     <ItemGroup>
       <Folder Include="publish\" />
     </ItemGroup>
-
 </Project>

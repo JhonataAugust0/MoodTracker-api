@@ -4,12 +4,11 @@ using System.Security.Cryptography;
 using System.Text;
 using Domain.Entities;
 using Microsoft.IdentityModel.Tokens;
+using MoodTracker_back.Application.Services;
 
-namespace Infrastructure.Adapters;
+namespace MoodTracker_back.Infrastructure.Adapters;
 
-using Application.Services;
-
-public class JwtTokenGenerator : ITokenGenerator
+public class JwtTokenGenerator : ITokenService
 {
     private readonly IConfiguration _configuration;
 

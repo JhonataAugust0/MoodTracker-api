@@ -1,4 +1,4 @@
-namespace Application.Services;
+namespace MoodTracker_back.Application.Services;
 
 public interface IEmailService
 {

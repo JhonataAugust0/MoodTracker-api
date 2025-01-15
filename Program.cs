@@ -1,15 +1,16 @@
 using System.Text;
 using DotNetEnv;
 using Infrastructure.Data.Config;
-using Application.Services;
-using Infrastructure.Adapters;
 using Domain.Interfaces;
-using Infrastructure.Data.Repositories;
 using Infrastructure.Middlewares;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using MoodTracker_back.Application.Services;
+using MoodTracker_back.Infrastructure.Adapters;
+using MoodTracker_back.Infrastructure.Data.Repositories;
+using MoodTracker_back.Infrastructure.Middlewares;
 
 
 DotNetEnv.Env.Load();
@@ -34,12 +35,17 @@ builder.Services.AddHealthChecks();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddHttpContextAccessor();
+
 
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
-builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
-builder.Services.AddScoped<ITokenGenerator, JwtTokenGenerator>();
-builder.Services.AddScoped<IUserRepository, UserRepository>(); 
+builder.Services.AddScoped<IPasswordService, PasswordService>();
+builder.Services.AddScoped<ITokenService, JwtTokenGenerator>();
 builder.Services.AddScoped<IEmailService, Smtp>();
+builder.Services.AddScoped<IUserService, UserService>(); 
+builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
+builder.Services.AddScoped<IUserRepository, UserRepository>(); 
+
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -106,6 +112,7 @@ app.UseSwagger();
 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "MoodTracker API v1.0"));
 
 app.UseMiddleware<AuthMiddleware>();
+app.UseMiddleware<ErrorHandlingMiddleware>();
 
 if (app.Environment.IsDevelopment())
 {

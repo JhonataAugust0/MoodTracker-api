@@ -1,8 +1,8 @@
 using Domain.Entities;
 
-namespace Application.Services;
+namespace MoodTracker_back.Application.Services;
 
-public interface ITokenGenerator
+public interface ITokenService
 {
     string GenerateJwtToken(User user);
     string GenerateRefreshToken();
