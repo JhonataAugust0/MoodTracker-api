@@ -113,6 +113,12 @@ if (app.Environment.IsDevelopment())
     app.UseCors();
 }
 
+if (builder.Environment.IsProduction())
+{
+    builder.Services.AddDbContext<ApplicationDbContext>(options =>
+        options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+}
+
 app.MapHealthChecks("/health");
 
 app.UseAuthentication();
@@ -121,3 +127,5 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+public partial class Program { }

@@ -20,7 +20,7 @@ public class AuthMiddleware
             context.Response.StatusCode = 401;
             await context.Response.WriteAsJsonAsync(new { message = "Unauthorized" });
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             context.Response.StatusCode = 500;
             await context.Response.WriteAsJsonAsync(new { message = "An error occurred" });
