@@ -8,7 +8,6 @@ namespace MoodTracker_back.Presentation.Controllers
   [ApiController]
   [Route("api/password")]
   public class PasswordController : ControllerBase
-
   {
     private readonly IPasswordService _passwordService;
 
@@ -24,14 +23,14 @@ namespace MoodTracker_back.Presentation.Controllers
       return Ok(new { success = result });
     }
 
-    [HttpPost("reset")]
+    [HttpPost("change")]
     [Authorize]
-    public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
+    public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequestDTO request)
     {
-      var result = await _passwordService.ResetPasswordAsync(request.Email, request.Token, request.NewPassword);
+      var result = await _passwordService.ChangePasswordAsync(request.Email, request.Password, request.NewPassword);
       if (!result)
       {
-        return BadRequest("Invalid or expired reset token");
+        return Unauthorized("Invalid current password");
       }
       return Ok(new { success = true });
     }

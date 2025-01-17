@@ -1,51 +1,57 @@
-using System.Text;
 using DotNetEnv;
-using Infrastructure.Data.Config;
-using Domain.Interfaces;
-using Infrastructure.Middlewares;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+using System.Text;
+
+using Microsoft.OpenApi.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+
+using Domain.Interfaces;
+using Infrastructure.Middlewares;
+using Infrastructure.Data.Config;
 using MoodTracker_back.Application.Services;
 using MoodTracker_back.Infrastructure.Adapters;
-using MoodTracker_back.Infrastructure.Data.Repositories;
 using MoodTracker_back.Infrastructure.Middlewares;
-
+using MoodTracker_back.Infrastructure.Data.Repositories;
 
 DotNetEnv.Env.Load();
 
 var builder = WebApplication.CreateBuilder(args);
+var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING") ?? 
+                       builder.Configuration.GetConnectionString("DefaultConnection");
 
 builder.Configuration.AddEnvironmentVariables();
 builder.Configuration.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
 builder.Configuration.AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true);
 
-
-var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING") ?? 
-                       builder.Configuration.GetConnectionString("DefaultConnection");
-
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString));
 
-builder.Services.Configure<EmailSettings>(
-    builder.Configuration.GetSection("EmailSettings"));
+builder.Services.Configure<EmailSettings>(options =>
+{
+    options.SmtpServer = Environment.GetEnvironmentVariable("SMTP_HOST") ?? string.Empty;
+    options.SmtpPort = int.Parse(Environment.GetEnvironmentVariable("SMTP_PORT") ?? "25");
+    options.SmtpUsername = Environment.GetEnvironmentVariable("USER") ?? string.Empty;
+    options.SmtpPassword = Environment.GetEnvironmentVariable("PASSWORD") ?? string.Empty;
+    options.FromEmail = Environment.GetEnvironmentVariable("FROM_ADDERS") ?? string.Empty;
+    options.FromName = "Your App Name";
+    options.UseSSL = false;
+});
 
-builder.Services.AddHealthChecks();
-builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
+
 builder.Services.AddSwaggerGen();
+builder.Services.AddControllers();
+builder.Services.AddHealthChecks();
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddEndpointsApiExplorer();
 
-
-builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
-builder.Services.AddScoped<IPasswordService, PasswordService>();
-builder.Services.AddScoped<ITokenService, JwtTokenGenerator>();
-builder.Services.AddScoped<IEmailService, Smtp>();
+builder.Services.AddTransient<IEmailService, Smtp>();
 builder.Services.AddScoped<IUserService, UserService>(); 
-builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>(); 
-
+builder.Services.AddScoped<ITokenService, JwtTokenGenerator>();
+builder.Services.AddScoped<IPasswordService, PasswordService>();
+builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
+builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -66,7 +72,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "MoodTracker API", Version = "v1" });
-
     c.AddSecurityDefinition("JWT", new OpenApiSecurityScheme
     {
         Name = "Authorization",
@@ -108,31 +113,21 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-app.UseSwagger();
-app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "MoodTracker API v1.0"));
-
-app.UseMiddleware<AuthMiddleware>();
-app.UseMiddleware<ErrorHandlingMiddleware>();
-
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
     app.UseCors();
 }
 
-if (builder.Environment.IsProduction())
-{
-    builder.Services.AddDbContext<ApplicationDbContext>(options =>
-        options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
-}
+app.UseSwagger();
+app.UseMiddleware<AuthMiddleware>();
+app.UseMiddleware<ErrorHandlingMiddleware>();
+app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "MoodTracker API v1.0"));
 
 app.MapHealthChecks("/health");
-
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
-
 app.Run();
 
 public partial class Program { }

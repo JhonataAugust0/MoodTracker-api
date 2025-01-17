@@ -41,7 +41,6 @@ public class PasswordService : IPasswordService
         var user = await _userRepository.GetByEmailAsync(email);
         if (user == null) return false;
 
-        // Lógica de geração de token de reset deveria estar em um serviço específico
         var resetToken = Guid.NewGuid().ToString();
         await _emailService.SendPasswordResetEmailAsync(email, resetToken);
         return true;
@@ -58,10 +57,10 @@ public class PasswordService : IPasswordService
         await _userRepository.UpdateAsync(user);
         return true;
     }
-
-    public async Task<bool> ChangePasswordAsync(int userId, string currentPassword, string newPassword)
+    
+    public async Task<bool> ChangePasswordAsync(string email, string currentPassword, string newPassword)
     {
-        var user = await _userRepository.GetByIdAsync(userId);
+        var user = await _userRepository.GetByEmailAsync(email);
         if (user == null) return false;
 
         var parts = user.PasswordHash.Split(':');

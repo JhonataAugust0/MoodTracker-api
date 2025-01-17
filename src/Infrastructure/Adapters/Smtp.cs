@@ -17,9 +17,6 @@ public class EmailSettings
     public bool UseSSL { get; set; }
 }
 
-// Infrastructure/Email/EmailService.cs
-
-
 public class Smtp : IEmailService
 {
     private readonly EmailSettings _emailSettings;
@@ -29,6 +26,21 @@ public class Smtp : IEmailService
     {
         _emailSettings = emailSettings.Value;
         _logger = logger;
+
+        ValidateSettings();
+    }
+    private void ValidateSettings()
+    {
+        if (string.IsNullOrWhiteSpace(_emailSettings.SmtpServer))
+            throw new InvalidOperationException("SMTP server is not configured.");
+        if (_emailSettings.SmtpPort <= 0)
+            throw new InvalidOperationException("SMTP port is invalid.");
+        if (string.IsNullOrWhiteSpace(_emailSettings.SmtpUsername))
+            throw new InvalidOperationException("SMTP username is not configured.");
+        if (string.IsNullOrWhiteSpace(_emailSettings.SmtpPassword))
+            throw new InvalidOperationException("SMTP password is not configured.");
+        if (string.IsNullOrWhiteSpace(_emailSettings.FromEmail))
+            throw new InvalidOperationException("FromEmail is not configured.");
     }
 
     public async Task SendPasswordResetEmailAsync(string toEmail, string resetToken)
@@ -36,8 +48,8 @@ public class Smtp : IEmailService
         try
         {
             using var client = CreateSmtpClient();
-            var message = CreatePasswordResetEmail(toEmail, resetToken);
-            
+            using var message = CreatePasswordResetEmail(toEmail, resetToken);
+
             await client.SendMailAsync(message);
             _logger.LogInformation("Password reset email sent successfully to {Email}", toEmail);
         }
@@ -50,23 +62,23 @@ public class Smtp : IEmailService
 
     private SmtpClient CreateSmtpClient()
     {
-        var client = new SmtpClient(_emailSettings.SmtpServer, _emailSettings.SmtpPort)
+        return new SmtpClient(_emailSettings.SmtpServer, _emailSettings.SmtpPort)
         {
             Credentials = new NetworkCredential(_emailSettings.SmtpUsername, _emailSettings.SmtpPassword),
             EnableSsl = _emailSettings.UseSSL
         };
-
-        return client;
     }
 
     private MailMessage CreatePasswordResetEmail(string toEmail, string resetToken)
     {
+        var resetLink = $"/reset-password?token={WebUtility.UrlEncode(resetToken)}";
+
         var message = new MailMessage
         {
             From = new MailAddress(_emailSettings.FromEmail, _emailSettings.FromName),
             Subject = "Password Reset Request",
             IsBodyHtml = true,
-            Body = GeneratePasswordResetEmailBody(resetToken)
+            Body = GeneratePasswordResetEmailBody(resetLink)
         };
 
         message.To.Add(toEmail);

@@ -6,7 +6,7 @@ using MoodTracker_back.Presentation.Api.V1.Dtos;
 namespace MoodTracker_back.Presentation.Controllers
 {
   [ApiController]
-  [Route("api/[controller]")]
+  [Route("api/auth")]
   public class AuthController : ControllerBase
 
   {
@@ -41,7 +41,7 @@ namespace MoodTracker_back.Presentation.Controllers
     }
     
     [HttpDelete("session")]
-    [Authorize]
+    [Authorize] 
     public async Task<IActionResult> Logout([FromBody] LogoutRequestDTO request)
     {
       var result = await _authService.RevokeTokenAsync(request.RefreshToken);
