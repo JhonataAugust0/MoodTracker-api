@@ -70,7 +70,7 @@ public class UserService : IUserService
         if (user == null)
         {
             throw new NotFoundException("User not found");
-        };
+        }
             
         await _userRepository.DeleteAsync(user);
     }

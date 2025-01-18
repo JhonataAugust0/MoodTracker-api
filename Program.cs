@@ -46,7 +46,11 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddTransient<IEmailService, Smtp>();
+builder.Services.AddScoped<ITagService, TagService>();
 builder.Services.AddScoped<IUserService, UserService>(); 
+builder.Services.AddScoped<IMoodService, MoodService>();
+builder.Services.AddScoped<ITagRepository, TagRepository>();
+builder.Services.AddScoped<IMoodRepository, MoodRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>(); 
 builder.Services.AddScoped<ITokenService, JwtTokenGenerator>();
 builder.Services.AddScoped<IPasswordService, PasswordService>();

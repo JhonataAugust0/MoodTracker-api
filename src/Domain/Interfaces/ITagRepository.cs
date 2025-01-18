@@ -11,4 +11,5 @@ public interface ITagRepository
     Task DeleteAsync(int id);
 
     Task<IEnumerable<Tag>> GetByIdsAsync(IEnumerable<int> ids);
+    Task<IEnumerable<Tag>> GetUserTagsAsync(int userId);
 }

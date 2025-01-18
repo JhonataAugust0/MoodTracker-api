@@ -22,7 +22,7 @@ public class MoodService : IMoodService
     {
         var mood = await _moodRepository.GetByIdAsync(id);
         if (mood == null || mood.UserId != userId)
-            throw new CultureNotFoundException("Mood not found");
+            throw new NotFoundException("Mood not found");
 
         return MapToDto(mood);
     }
