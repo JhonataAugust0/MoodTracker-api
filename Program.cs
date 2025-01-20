@@ -47,15 +47,18 @@ builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddTransient<IEmailService, Smtp>();
 builder.Services.AddScoped<ITagService, TagService>();
-builder.Services.AddScoped<IUserService, UserService>(); 
 builder.Services.AddScoped<IMoodService, MoodService>();
+builder.Services.AddScoped<IUserService, UserService>(); 
+builder.Services.AddScoped<IHabitService, HabitService>();
 builder.Services.AddScoped<ITagRepository, TagRepository>();
 builder.Services.AddScoped<IMoodRepository, MoodRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>(); 
 builder.Services.AddScoped<ITokenService, JwtTokenGenerator>();
 builder.Services.AddScoped<IPasswordService, PasswordService>();
+builder.Services.AddScoped<IHabitRepository, HabitRepository>();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
+builder.Services.AddScoped<IHabitCompletionRepository, HabitCompletionCompletionRepository>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>

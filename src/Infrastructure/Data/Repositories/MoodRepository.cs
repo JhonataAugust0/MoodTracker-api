@@ -21,6 +21,26 @@ public class MoodRepository : IMoodRepository
             .Include(m => m.Tags)
             .FirstOrDefaultAsync(m => m.Id == id);
     }
+    
+    public async Task<IEnumerable<Mood>> GetUserMoodsAsync(int userId)
+    {
+        return await _context.MoodEntries
+            .Include(h => h.Tags)
+            .Where(h => h.UserId == userId)
+            .OrderByDescending(h => h.Id)
+            .ToListAsync();
+    }
+
+    public async Task<IEnumerable<Mood>> GetUserHistoryMoodAsync(int moodId, DateTimeOffset? startDate = null, DateTimeOffset? endDate = null)
+    {
+        return await _context.MoodEntries
+            .Include(m => m.Tags)
+            .Where(m => m.Id == moodId &&
+                        (!startDate.HasValue || m.Timestamp >= startDate.Value) &&
+                        (!endDate.HasValue || m.Timestamp <= endDate.Value.AddDays(1)))
+            .OrderByDescending(m => m.Timestamp)
+            .ToListAsync();
+    }
 
     public async Task<IEnumerable<Mood>> GetByUserIdAsync(int userId)
     {

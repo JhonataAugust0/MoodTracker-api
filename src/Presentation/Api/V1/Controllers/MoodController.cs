@@ -35,15 +35,20 @@ namespace MoodTracker_back.Presentation.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<MoodDto>>> GetMoodHistory(
-            [FromQuery] DateTimeOffset? startDate,
+        public async Task<ActionResult<IEnumerable<MoodDto>>> GetUserMoods()
+        {
+            var moods = await _moodService.GetUserMoodsAsync(_currentUserService.UserId);
+            return Ok(moods);
+        }
+        
+        [HttpGet("history")]
+        public async Task<ActionResult<IEnumerable<HabitDto>>> GetUserMoodHistory(
+            [FromQuery] int moodId,
+            [FromQuery] DateTimeOffset? startDate, 
             [FromQuery] DateTimeOffset? endDate)
         {
-            var moods = await _moodService.GetUserMoodHistoryAsync(
-                _currentUserService.UserId,
-                startDate,
-                endDate);
-            return Ok(moods);
+            var habits = await _moodService.GetUserMoodHistoryAsync(moodId, startDate, endDate);
+            return Ok(habits);
         }
 
         [HttpPost]

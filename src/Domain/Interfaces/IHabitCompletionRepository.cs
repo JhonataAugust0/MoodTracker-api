@@ -10,4 +10,7 @@ public interface IHabitCompletionRepository
     Task CreateAsync(HabitCompletion habitCompletion);
     Task UpdateAsync(HabitCompletion habitCompletion);
     Task DeleteAsync(int id);
+
+    Task<IEnumerable<HabitCompletion>> GetUserHistoryHabitCompletionAsync(int habitId, DateTimeOffset? startDate = null,
+        DateTimeOffset? endDate = null);
 }

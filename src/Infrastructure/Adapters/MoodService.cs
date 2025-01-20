@@ -26,17 +26,19 @@ public class MoodService : IMoodService
 
         return MapToDto(mood);
     }
-
-    public async Task<IEnumerable<MoodDto>> GetUserMoodHistoryAsync(int userId, DateTimeOffset? startDate = null, DateTimeOffset? endDate = null)
+    
+    public async Task<IEnumerable<MoodDto>> GetUserMoodsAsync(int userId)
     {
-        var moods = await _moodRepository.GetByUserIdAsync(userId);
-        
-        if (startDate.HasValue)
-            moods = moods.Where(m => m.Timestamp >= startDate.Value);
-        
-        if (endDate.HasValue)
-            moods = moods.Where(m => m.Timestamp <= endDate.Value);
+        var habits = await _moodRepository.GetUserMoodsAsync(userId);
+        return habits.Select(MapToDto);
+    }
 
+    public async Task<IEnumerable<MoodDto>> GetUserMoodHistoryAsync(int moodId, DateTimeOffset? startDate = null, DateTimeOffset? endDate = null)
+    {
+        if (startDate > endDate)
+            throw new ArgumentException("A data inicial não pode ser posterior à data final.");
+        
+        var moods = await _moodRepository.GetUserHistoryMoodAsync(moodId, startDate, endDate);
         return moods.Select(MapToDto);
     }
 

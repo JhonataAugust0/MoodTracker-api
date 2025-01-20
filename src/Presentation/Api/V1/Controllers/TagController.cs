@@ -1,10 +1,12 @@
+using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MoodTracker_back.Infrastructure.Exceptions;
 using MoodTracker_back.Application.Services;
+using MoodTracker_back.Infrastructure.Exceptions;
 using MoodTracker_back.Presentation.Api.V1.Dtos;
 
-namespace MoodTracker_back.Presentation.Controllers
+
+namespace TagTracker_back.Presentation.Controllers
 {
     [ApiController]
     [Route("api/tags")]
@@ -21,33 +23,40 @@ namespace MoodTracker_back.Presentation.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<MoodDto>> GetMood(int id)
+        public async Task<ActionResult<TagDto>> GetTag(int id)
         {
             try
             {
-                var mood = await _tagService.GetTagByIdAsync(id, _currentUserService.UserId);
-                return Ok(mood);
+                var tag = await _tagService.GetTagByIdAsync(id, _currentUserService.UserId);
+                return Ok(tag);
             }
             catch (NotFoundException)
             {
                 return NotFound("Tag not found");
             }
         }
+        
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<TagDto>>> GetUserTags()
+        {
+            var tags = await _tagService.GetUserTagsAsync(_currentUserService.UserId);
+            return Ok(tags);
+        }
 
         [HttpPost]
-        public async Task<ActionResult<MoodDto>> CreateTag(CreateTagDto createTagDto)
+        public async Task<ActionResult<TagDto>> CreateTag(CreateTagDto createTagDto)
         {
             var tag = await _tagService.CreateTagAsync(_currentUserService.UserId, createTagDto);
-            return CreatedAtAction(nameof(GetMood), new { id = tag.Id }, tag);
+            return CreatedAtAction(nameof(GetTag), new { id = tag.Id }, tag);
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<MoodDto>> UpdateMood(int id, UpdateTagDto updateTagDto)
+        public async Task<ActionResult<TagDto>> UpdateTag(int id, UpdateTagDto updateTagDto)
         {
             try
             {
-                var mood = await _tagService.UpdateTagAsync(id, _currentUserService.UserId, updateTagDto);
-                return Ok(mood);
+                var tag = await _tagService.UpdateTagAsync(id, _currentUserService.UserId, updateTagDto);
+                return Ok(tag);
             }
             catch (NotFoundException)
             {
@@ -56,7 +65,7 @@ namespace MoodTracker_back.Presentation.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult> DeleteMood(int id)
+        public async Task<ActionResult> DeleteTag(int id)
         {
             try
             {

@@ -31,7 +31,6 @@ public class TagRepository : ITagRepository
     public async Task<IEnumerable<Tag>> GetUserTagsAsync(int userId)
     {
         return await _context.Tags
-            .Include(t => t.User)
             .Where(t => t.UserId == userId)
             .ToListAsync();
     }
