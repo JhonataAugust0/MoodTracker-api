@@ -84,7 +84,7 @@ public class AuthenticationService : IAuthenticationService
         return new AuthResult
         {
             Success = true,
-            Token = token,
+            Token = "Bearer " + token,
             RefreshToken = refreshToken
         };
     }
