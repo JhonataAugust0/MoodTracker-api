@@ -56,7 +56,9 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ITokenService, JwtTokenGenerator>();
 builder.Services.AddScoped<IPasswordService, PasswordService>();
 builder.Services.AddScoped<IHabitRepository, HabitRepository>();
+builder.Services.AddScoped<IQuickNotesService, QuickNotesService>();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
+builder.Services.AddScoped<IQuickNoteRepository, QuickNotesRepository>();
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 builder.Services.AddScoped<IHabitCompletionRepository, HabitCompletionCompletionRepository>();
 
