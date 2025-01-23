@@ -10,7 +10,7 @@ services:
     networks:
       - moodtracker-network-dev
     depends_on:
-      - moodtracker-api
+      - moodtracker-api-dev
 
   moodtracker-api-dev:
     container_name: moodtracker-api-dev
@@ -42,7 +42,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - moodtracker-network-dev
-    env_file: .env
+    env_file: .env.dev
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
