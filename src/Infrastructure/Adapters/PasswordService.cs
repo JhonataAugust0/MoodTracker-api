@@ -14,7 +14,7 @@ public class PasswordService : IPasswordService
     public PasswordService(
         IUserRepository userRepository,
         IEmailService emailService,
-        ILoggingService _logger)
+        ILoggingService logger)
     {
         _userRepository = userRepository;
         _emailService = emailService;
