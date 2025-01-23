@@ -9,13 +9,16 @@ public class PasswordService : IPasswordService
 {
     private readonly IUserRepository _userRepository;
     private readonly IEmailService _emailService;
+    private readonly ILoggingService _logger;
 
     public PasswordService(
         IUserRepository userRepository,
-        IEmailService emailService)
+        IEmailService emailService,
+        ILoggingService logger)
     {
         _userRepository = userRepository;
         _emailService = emailService;
+        _logger = logger;
     }
     
     public string HashPassword(string password, out string salt)
@@ -38,9 +41,11 @@ public class PasswordService : IPasswordService
     
     public async Task<bool> RequestPasswordResetAsync(string email)
     {
+        await _logger.LogInformationAsync("Usuário de email " + email + " solicitando redefinição de senha", [email]);
         var user = await _userRepository.GetByEmailAsync(email);
         if (user == null) return false;
 
+        await _logger.LogInformationAsync("Redefinição de senha do usuário de email " + email + " bem sucedida", [email]);
         var resetToken = Guid.NewGuid().ToString();
         await _emailService.SendPasswordResetEmailAsync(email, resetToken);
         return true;
@@ -60,6 +65,7 @@ public class PasswordService : IPasswordService
     
     public async Task<bool> ChangePasswordAsync(string email, string currentPassword, string newPassword)
     {
+        await _logger.LogInformationAsync("Usuário de email " + email + " realizando mudança de senha", [email]);
         var user = await _userRepository.GetByEmailAsync(email);
         if (user == null) return false;
 
@@ -75,6 +81,7 @@ public class PasswordService : IPasswordService
         var passwordHash = HashPassword(newPassword, out string newSalt);
         user.PasswordHash = passwordHash + ":" + newSalt;
 
+        await _logger.LogInformationAsync("Mudança de senha do usuário de email " + email + " bem sucedida", [email]);
         await _userRepository.UpdateAsync(user);
         return true;
     }

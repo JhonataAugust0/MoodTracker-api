@@ -20,12 +20,10 @@ public class EmailSettings
 public class Smtp : IEmailService
 {
     private readonly EmailSettings _emailSettings;
-    private readonly ILogger<Smtp> _logger;
 
-    public Smtp(IOptions<EmailSettings> emailSettings, ILogger<Smtp> logger)
+    public Smtp(IOptions<EmailSettings> emailSettings)
     {
         _emailSettings = emailSettings.Value;
-        _logger = logger;
 
         ValidateSettings();
     }
@@ -51,11 +49,9 @@ public class Smtp : IEmailService
             using var message = CreatePasswordResetEmail(toEmail, resetToken);
 
             await client.SendMailAsync(message);
-            _logger.LogInformation("Password reset email sent successfully to {Email}", toEmail);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to send password reset email to {Email}", toEmail);
             throw new ApplicationException("Failed to send password reset email", ex);
         }
     }
