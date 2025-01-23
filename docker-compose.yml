@@ -10,7 +10,7 @@ services:
       - "5000:5000"
     networks:
       - moodtracker-network
-    env_file: .env
+    env_file: .env.prod
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:5000
@@ -20,33 +20,6 @@ services:
       timeout: 10s
       retries: 3
       start_period: 20s
-    depends_on:
-      moodtracker-db:
-        condition: service_healthy
-
-  moodtracker-db:
-    image: postgres:15-alpine
-    container_name: moodtracker-db
-    hostname: moodtracker-db
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    networks:
-      - moodtracker-network
-    env_file: .env
-    environment:
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_DB=${POSTGRES_DB}
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 5s
-      timeout: 3s
-      retries: 5
-
-volumes:
-  postgres_data:
 
 networks:
   moodtracker-network:
