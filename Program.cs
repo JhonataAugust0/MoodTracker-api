@@ -10,6 +10,7 @@ using Domain.Interfaces;
 using Infrastructure.Middlewares;
 using Infrastructure.Data.Config;
 using MoodTracker_back.Application.Services;
+using MoodTracker_back.Infrastructure.Logging;
 using MoodTracker_back.Infrastructure.Adapters;
 using MoodTracker_back.Infrastructure.Middlewares;
 using MoodTracker_back.Infrastructure.Data.Repositories;
@@ -23,7 +24,6 @@ var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING") ?
 builder.Configuration.AddEnvironmentVariables();
 builder.Configuration.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
 builder.Configuration.AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true);
-
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString));
 
@@ -38,7 +38,6 @@ builder.Services.Configure<EmailSettings>(options =>
     options.UseSSL = false;
 });
 
-
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 builder.Services.AddHealthChecks();
@@ -50,6 +49,7 @@ builder.Services.AddScoped<ITagService, TagService>();
 builder.Services.AddScoped<IMoodService, MoodService>();
 builder.Services.AddScoped<IUserService, UserService>(); 
 builder.Services.AddScoped<IHabitService, HabitService>();
+builder.Services.AddScoped<ILoggingService, LoggingService>();
 builder.Services.AddScoped<ITagRepository, TagRepository>();
 builder.Services.AddScoped<IMoodRepository, MoodRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>(); 
@@ -109,6 +109,8 @@ builder.WebHost.ConfigureKestrel(options =>
 {
     options.ListenAnyIP(5000);
 });
+
+LoggingConfiguration.ConfigureLogging(builder);
 
 var app = builder.Build();
 

@@ -11,49 +11,23 @@ public class AuthenticationService : IAuthenticationService
     private readonly IUserService _userService;
     private readonly IPasswordService _PasswordService;
     private readonly ITokenService _tokenGenerator;
+    private readonly ILoggingService _logger;
 
     public AuthenticationService(
         IUserService userService,
         IPasswordService PasswordService,
-        ITokenService tokenGenerator)
+        ITokenService tokenGenerator,
+        ILoggingService logger)
     {
         _userService = userService;
         _PasswordService = PasswordService;
         _tokenGenerator = tokenGenerator;
-    }
-
-    public async Task<AuthResult> RegisterAsync(string email, string password, string? name)
-    {
-        try
-        {
-            var user = await _userService.RegisterUserAsync(email, password, name);
-            
-            var token = _tokenGenerator.GenerateJwtToken(user);
-            var refreshToken = _tokenGenerator.GenerateRefreshToken();
-
-            user.RefreshTokens.Add(new RefreshToken
-            {
-                Token = refreshToken,
-                ExpiresAt = DateTimeOffset.UtcNow.AddDays(7)
-            });
-
-            await _userService.UpdateUserAsync(user);
-
-            return new AuthResult
-            {
-                Success = true,
-                Token = token,
-                RefreshToken = refreshToken
-            };
-        }
-        catch (ValidationException ex)
-        {
-            return new AuthResult { Success = false, Error = ex.Message };
-        }
+        _logger = logger;
     }
 
     public async Task<AuthResult> LoginAsync(string email, string password)
     {
+        await _logger.LogInformationAsync("Usuário de email " + email + " realizando login", [email]);
         var user = await _userService.GetUserByEmailAsync(email);
         if (user == null)
         {
@@ -80,7 +54,8 @@ public class AuthenticationService : IAuthenticationService
         user.LastLogin = DateTimeOffset.UtcNow;
 
         await _userService.UpdateUserAsync(user);
-
+        await _logger.LogInformationAsync("Login do usuário de email " + email + " bem sucedido", [email]);
+        
         return new AuthResult
         {
             Success = true,
@@ -91,6 +66,7 @@ public class AuthenticationService : IAuthenticationService
 
     public async Task<AuthResult> RefreshTokenAsync(string refreshToken)
     {
+        await _logger.LogInformationAsync("Usuário de refreshToken " + refreshToken + " realizando renovação da sessão", [refreshToken]);
         var user = await _userService.GetUserByRefreshTokenAsync(refreshToken);
         if (user == null)
         {
@@ -112,7 +88,8 @@ public class AuthenticationService : IAuthenticationService
             Token = newRefreshToken,
             ExpiresAt = DateTimeOffset.UtcNow.AddDays(7)
         });
-
+    
+        await _logger.LogInformationAsync("Renovação da sessão do usuário de refreshToken " + refreshToken + " bem sucedida", [refreshToken]);
         await _userService.UpdateUserAsync(user);
 
         return new AuthResult
@@ -130,7 +107,8 @@ public class AuthenticationService : IAuthenticationService
 
         var token = user.RefreshTokens.FirstOrDefault(rt => rt.Token == refreshToken);
         if (token == null) return false;
-
+    
+        await _logger.LogInformationAsync("Usuário de refreshToken " + refreshToken + " realizando logout", [refreshToken]);
         user.RefreshTokens.Remove(token);
         await _userService.UpdateUserAsync(user);
         return true;
