@@ -108,6 +108,11 @@ builder.Services.AddSwaggerGen(c =>
 builder.WebHost.ConfigureKestrel(options =>
 {
     options.ListenAnyIP(5000);
+    // options.ListenAnyIP(5001, listenOptions =>
+    //     {
+    //         listenOptions.UseHttps();
+    //     });
+    
 });
 
 LoggingConfiguration.ConfigureLogging(builder);
