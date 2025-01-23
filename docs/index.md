@@ -1,8 +1,5 @@
 # MoodTracker
 
-## Objetivo do projeto
-
-O MoodTracker é uma aplicação para rastrear humor e hábitos, permitindo aos usuários monitorar seu bem-estar emocional e comportamental de forma intuitiva e visual. O sistema inclui funcionalidades como registro diário de humor, gerenciador de hábitos, blocos de notas rápidas, e painéis de visualização de dados para análise.
 ### Sumário
 
 - [Configuração do projeto](./config.md)
