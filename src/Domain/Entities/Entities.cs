@@ -1,5 +1,14 @@
 namespace Domain.Entities
 {
+    public enum FrequencyType
+    {
+        Daily = 1,
+        Weekly = 2,
+        Monthly = 3,
+        Yearly = 4,
+        Custom = 5
+    }
+
     public class User
     {
         public int Id { get; set; }
@@ -62,7 +71,9 @@ namespace Domain.Entities
         public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
         public DateTimeOffset UpdatedAt { get; set; } = DateTimeOffset.UtcNow;
         public bool IsActive { get; set; } = true;
-
+        public int FrequencyTarget { get; set; } = 1;
+        public string Color { get; set; }
+        public FrequencyType FrequencyType { get; set; } = FrequencyType.Daily;
         public User User { get; set; } = null!;
         public ICollection<Tag> Tags { get; set; } = new List<Tag>();
     }

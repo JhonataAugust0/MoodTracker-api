@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Domain.Entities;
 
 namespace MoodTracker_back.Presentation.Api.V1.Dtos;
 
@@ -12,6 +13,9 @@ public class HabitDto
     public DateTimeOffset? UpdatedAt { get; set; }
     public bool IsActive { get; set; }
     public ICollection<TagDto> Tags { get; set; } = new List<TagDto>();
+    public int FrequencyTarget { get; set; } = 1;
+    public FrequencyType FrequencyType { get; set; } = FrequencyType.Daily;
+    public string Color { get; set; }
 }
 
 public class CreateHabitDto
@@ -21,6 +25,9 @@ public class CreateHabitDto
     public bool? IsActive { get; set; }
     public ICollection<int>? TagIds { get; set; } = new List<int>();
     public DateTimeOffset? CreatedAt { get; set; }
+    public int FrequencyTarget { get; set; } = 1;
+    public FrequencyType FrequencyType { get; set; } = FrequencyType.Daily;
+    public string Color { get; set; }
 }
 
 public class UpdateHabitDto
@@ -29,6 +36,9 @@ public class UpdateHabitDto
     public string? Description { get; set; }
     public bool? IsActive { get; set; }
     public ICollection<int>? TagIds { get; set; }
+    public int FrequencyTarget { get; set; } = 1;
+    public FrequencyType FrequencyType { get; set; } = FrequencyType.Daily;
+    public string Color { get; set; }
 }
 
 public class LogHabitCompletionDto

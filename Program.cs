@@ -105,6 +105,18 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend",
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:5173")
+                  .AllowAnyMethod()
+                  .AllowAnyHeader()
+                  .AllowCredentials(); 
+        });
+});
+
 builder.WebHost.ConfigureKestrel(options =>
 {
     options.ListenAnyIP(5000);
@@ -132,7 +144,7 @@ using (var scope = app.Services.CreateScope())
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
-    app.UseCors();
+    app.UseCors("AllowFrontend");
 }
 
 app.UseSwagger();

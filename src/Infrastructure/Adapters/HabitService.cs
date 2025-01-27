@@ -54,7 +54,10 @@ public class HabitService : IHabitService
             Description = createHabitDto.Description,
             CreatedAt = createHabitDto.CreatedAt ?? DateTimeOffset.UtcNow, 
             UpdatedAt = createHabitDto.CreatedAt ?? DateTimeOffset.UtcNow, 
-            IsActive = createHabitDto.IsActive ?? true
+            IsActive = createHabitDto.IsActive ?? true,
+            FrequencyType = createHabitDto.FrequencyType,
+            FrequencyTarget = createHabitDto.FrequencyTarget,
+            Color = createHabitDto.Color
         };
 
         if (createHabitDto.TagIds.Any())
@@ -148,6 +151,9 @@ public class HabitService : IHabitService
             CreatedAt = habit.CreatedAt,
             UpdatedAt = habit.UpdatedAt,
             IsActive = habit.IsActive,
+            FrequencyType = habit.FrequencyType,
+            FrequencyTarget = habit.FrequencyTarget,
+            Color = habit.Color,
             Tags = habit.Tags.Select(tag => new TagDto
             {
                 Id = tag.Id,
