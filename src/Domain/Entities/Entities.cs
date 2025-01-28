@@ -21,8 +21,9 @@ namespace Domain.Entities
         public DateTimeOffset? LastLogin { get; set; }
         public bool IsActive { get; set; } = true;
 
-        public ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
         public ICollection<Tag> Tags { get; set; } = new List<Tag>();
+        public ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
+        public ICollection<PasswordResetToken> PasswordResetTokens { get; set; } = new List<PasswordResetToken>();
     }
 
     public class RefreshToken
@@ -36,6 +37,18 @@ namespace Domain.Entities
         public User User { get; set; } = null!;
     }
 
+    public class PasswordResetToken
+    {
+        public int Id { get; set; }
+        public int UserId { get; set; }
+        public string Token { get; set; } = string.Empty;
+        public DateTimeOffset ExpiresAt { get; set; }
+        public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+        public bool Used { get; set; } = false;
+
+        public User User { get; set; } = null!;
+    }
+    
     public class Tag
     {
         public int Id { get; set; }

@@ -1,5 +1,6 @@
 using System.Security.Cryptography;
 using System.Text;
+using Domain.Entities;
 using Domain.Interfaces;
 using MoodTracker_back.Application.Services;
 
@@ -8,16 +9,22 @@ namespace MoodTracker_back.Infrastructure.Adapters;
 public class PasswordService : IPasswordService
 {
     private readonly IUserRepository _userRepository;
+    private readonly ITokenService _tokenService;
     private readonly IEmailService _emailService;
+    private readonly IPasswordResetTokenRepository _resetTokenRepository;
     private readonly ILoggingService _logger;
 
     public PasswordService(
         IUserRepository userRepository,
         IEmailService emailService,
+        ITokenService tokenService,
+        IPasswordResetTokenRepository resetTokenRepository,
         ILoggingService logger)
     {
         _userRepository = userRepository;
         _emailService = emailService;
+        _tokenService = tokenService;
+        _resetTokenRepository = resetTokenRepository;
         _logger = logger;
     }
     
@@ -41,31 +48,34 @@ public class PasswordService : IPasswordService
     
     public async Task<bool> RequestPasswordResetAsync(string email)
     {
-        await _logger.LogInformationAsync("Usuário de email " + email + " solicitando redefinição de senha", [email]);
         var user = await _userRepository.GetByEmailAsync(email);
         if (user == null) return false;
 
-        await _logger.LogInformationAsync("Redefinição de senha do usuário de email " + email + " bem sucedida", [email]);
-        var resetToken = Guid.NewGuid().ToString();
-        await _emailService.SendPasswordResetEmailAsync(email, resetToken);
-        return true;
-    }
+        var expiredTokens = await _resetTokenRepository.GetExpiredTokensAsync();
+        if (expiredTokens.Any())
+        {
+            await _resetTokenRepository.RemoveRangeAsync(expiredTokens);
+        }
 
-    public async Task<bool> ResetPasswordAsync(string email, string token, string newPassword)
-    {
-        var user = await _userRepository.GetByEmailAsync(email);
-        if (user == null) return false;
-        
-        var passwordHash = HashPassword(newPassword, out string salt);
-        user.PasswordHash = passwordHash + ":" + salt;
-        
-        await _userRepository.UpdateAsync(user);
-        return true;
+        var token = _tokenService.GeneratePasswordResetToken(user.Id, user.Email);
+        var resetToken = new PasswordResetToken()
+        {
+            UserId = user.Id,
+            Token = token,
+            ExpiresAt = DateTimeOffset.UtcNow.AddHours(24)
+        };
+
+        await _resetTokenRepository.AddAsync(resetToken);
+        await _resetTokenRepository.SaveChangesAsync();
+
+        var baseUrl = Environment.GetEnvironmentVariable("WEB_APP_URL");
+        var resetLink = $"{baseUrl}/change-password?token={Uri.EscapeDataString(token)}&email={user.Email}";
+
+        return await _emailService.SendPasswordRecoverEmailAsync(user.Email, resetLink);
     }
-    
-    public async Task<bool> ChangePasswordAsync(string email, string currentPassword, string newPassword)
+        
+    public async Task<bool> ChangePasswordAsync(string email, string token, string password, string newPassword)
     {
-        await _logger.LogInformationAsync("Usuário de email " + email + " realizando mudança de senha", [email]);
         var user = await _userRepository.GetByEmailAsync(email);
         if (user == null) return false;
 
@@ -73,16 +83,23 @@ public class PasswordService : IPasswordService
         var hash = parts[0];
         var salt = parts[1];
 
-        if (!VerifyPassword(currentPassword, hash, salt))
+        if (!VerifyPassword(password, hash, salt))
         {
             return false;
         }
+        
+        var resetToken = await _resetTokenRepository.GetValidTokenAsync(user.Id, token);
+        if (resetToken == null) return false;
 
-        var passwordHash = HashPassword(newPassword, out string newSalt);
-        user.PasswordHash = passwordHash + ":" + newSalt;
+        await _resetTokenRepository.MarkAsUsedAsync(resetToken);
 
-        await _logger.LogInformationAsync("Mudança de senha do usuário de email " + email + " bem sucedida", [email]);
+        var newSalt = "";
+        user.PasswordHash = HashPassword(newPassword, out newSalt);
+        user.UpdatedAt = DateTimeOffset.UtcNow;
+
         await _userRepository.UpdateAsync(user);
+        await _resetTokenRepository.SaveChangesAsync();
+
         return true;
     }
 }

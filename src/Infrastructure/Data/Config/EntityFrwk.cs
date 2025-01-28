@@ -14,6 +14,7 @@ namespace Infrastructure.Data.Config
         public DbSet<Habit> Habits { get; set; } = null!;
         public DbSet<HabitCompletion> HabitCompletions { get; set; } = null!;
         public DbSet<QuickNote> QuickNotes { get; set; } = null!;
+        public DbSet<PasswordResetToken> PasswordResetTokens { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -27,6 +28,12 @@ namespace Infrastructure.Data.Config
                 .HasMany(u => u.RefreshTokens)
                 .WithOne(rt => rt.User)
                 .HasForeignKey(rt => rt.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<User>()
+                .HasMany(u => u.PasswordResetTokens)
+                .WithOne(t => t.User)
+                .HasForeignKey(t => t.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Mood>()

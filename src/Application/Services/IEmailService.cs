@@ -2,5 +2,6 @@ namespace MoodTracker_back.Application.Services;
 
 public interface IEmailService
 {
-    Task SendPasswordResetEmailAsync(string email, string resetToken);
+    Task<bool> SendPasswordRecoverEmailAsync(string mailTo, string link);
+    Task<bool> SendAccounAccessedEmailAsync(string mailTo);
 }

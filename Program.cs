@@ -27,15 +27,13 @@ builder.Configuration.AddJsonFile("appsettings.Development.json", optional: true
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString));
 
-builder.Services.Configure<EmailSettings>(options =>
+builder.Services.AddSingleton(new EmailSettings 
 {
-    options.SmtpServer = Environment.GetEnvironmentVariable("SMTP_HOST") ?? string.Empty;
-    options.SmtpPort = int.Parse(Environment.GetEnvironmentVariable("SMTP_PORT") ?? "25");
-    options.SmtpUsername = Environment.GetEnvironmentVariable("USER") ?? string.Empty;
-    options.SmtpPassword = Environment.GetEnvironmentVariable("PASSWORD") ?? string.Empty;
-    options.FromEmail = Environment.GetEnvironmentVariable("FROM_ADDERS") ?? string.Empty;
-    options.FromName = "Your App Name";
-    options.UseSSL = false;
+    SmtpHost = Environment.GetEnvironmentVariable("SMTP_HOST") ?? "",
+    SmtpPort = Environment.GetEnvironmentVariable("SMTP_PORT") ?? "587",
+    UserEmail = Environment.GetEnvironmentVariable("SMTP_USER") ?? "",
+    Password = Environment.GetEnvironmentVariable("SMTP_PASSWORD") ?? "",
+    SenderName = Environment.GetEnvironmentVariable("SMTP_SENDER_NAME") ?? "MoodTracker"
 });
 
 builder.Services.AddSwaggerGen();
@@ -53,13 +51,14 @@ builder.Services.AddScoped<ILoggingService, LoggingService>();
 builder.Services.AddScoped<ITagRepository, TagRepository>();
 builder.Services.AddScoped<IMoodRepository, MoodRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>(); 
-builder.Services.AddScoped<ITokenService, JwtTokenGenerator>();
+builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IPasswordService, PasswordService>();
 builder.Services.AddScoped<IHabitRepository, HabitRepository>();
 builder.Services.AddScoped<IQuickNotesService, QuickNotesService>();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 builder.Services.AddScoped<IQuickNoteRepository, QuickNotesRepository>();
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
+builder.Services.AddScoped<IPasswordResetTokenRepository, PasswordResetTokenRepository>();
 builder.Services.AddScoped<IHabitCompletionRepository, HabitCompletionCompletionRepository>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

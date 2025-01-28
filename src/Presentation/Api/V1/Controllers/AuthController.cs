@@ -11,10 +11,12 @@ namespace MoodTracker_back.Presentation.Controllers
 
   {
     private readonly IAuthenticationService _authService;
+    private readonly IEmailService _emailService;
 
-    public AuthController(IAuthenticationService authService)
+    public AuthController(IAuthenticationService authService, IEmailService emailService)
     {
       _authService = authService;
+      _emailService = emailService;
     }
     
     [HttpPost("login")]
@@ -25,6 +27,8 @@ namespace MoodTracker_back.Presentation.Controllers
       {
         return BadRequest(result.Error);
       }
+
+      await _emailService.SendAccounAccessedEmailAsync(request.Email);
       return Ok(result);
     }
     

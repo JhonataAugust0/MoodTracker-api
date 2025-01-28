@@ -6,5 +6,7 @@ public interface ITokenService
 {
     string GenerateJwtToken(User user);
     string GenerateRefreshToken();
-    string GeneratePasswordResetToken();
+    string GeneratePasswordResetToken(int useId, string email);
+
+    (bool isValid, int userId, string email) ValidatePasswordResetToken(string token);
 }
