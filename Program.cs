@@ -1,19 +1,13 @@
 using DotNetEnv;
-using System.Text;
-
 using Microsoft.OpenApi.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 
-using Domain.Interfaces;
 using Infrastructure.Middlewares;
 using Infrastructure.Data.Config;
-using MoodTracker_back.Application.Services;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using MoodTracker_back.Infrastructure.Logging;
 using MoodTracker_back.Infrastructure.Adapters;
 using MoodTracker_back.Infrastructure.Middlewares;
-using MoodTracker_back.Infrastructure.Data.Repositories;
 
 DotNetEnv.Env.Load();
 
@@ -27,6 +21,7 @@ builder.Configuration.AddJsonFile("appsettings.Development.json", optional: true
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString));
 
+LoggingConfiguration.ConfigureLogging(builder);
 builder.Services.AddSingleton(new EmailSettings 
 {
     SmtpHost = Environment.GetEnvironmentVariable("SMTP_HOST") ?? "",
@@ -36,46 +31,12 @@ builder.Services.AddSingleton(new EmailSettings
     SenderName = Environment.GetEnvironmentVariable("SMTP_SENDER_NAME") ?? "MoodTracker"
 });
 
-builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
-builder.Services.AddHealthChecks();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddHealthChecks()
+    .AddDbContextCheck<ApplicationDbContext>();
 
-builder.Services.AddTransient<IEmailService, Smtp>();
-builder.Services.AddScoped<ITagService, TagService>();
-builder.Services.AddScoped<IMoodService, MoodService>();
-builder.Services.AddScoped<IUserService, UserService>(); 
-builder.Services.AddScoped<IHabitService, HabitService>();
-builder.Services.AddScoped<ILoggingService, LoggingService>();
-builder.Services.AddScoped<ITagRepository, TagRepository>();
-builder.Services.AddScoped<IMoodRepository, MoodRepository>();
-builder.Services.AddScoped<IUserRepository, UserRepository>(); 
-builder.Services.AddScoped<ITokenService, TokenService>();
-builder.Services.AddScoped<IPasswordService, PasswordService>();
-builder.Services.AddScoped<IHabitRepository, HabitRepository>();
-builder.Services.AddScoped<IQuickNotesService, QuickNotesService>();
-builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
-builder.Services.AddScoped<IQuickNoteRepository, QuickNotesRepository>();
-builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
-builder.Services.AddScoped<IPasswordResetTokenRepository, PasswordResetTokenRepository>();
-builder.Services.AddScoped<IHabitCompletionRepository, HabitCompletionCompletionRepository>();
-
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters()
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = Environment.GetEnvironmentVariable("JWT_ISSUER"),
-            ValidAudience = Environment.GetEnvironmentVariable("JWT_AUDIENCE"),
-            IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT_KEY")!))
-        };
-    });
 
 builder.Services.AddSwaggerGen(c =>
 {
@@ -104,17 +65,15 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowFrontend",
-        policy =>
-        {
-            policy.WithOrigins("http://localhost:5173")
-                  .AllowAnyMethod()
-                  .AllowAnyHeader()
-                  .AllowCredentials(); 
-        });
-});
+
+builder.Services.AddCustomCors();
+builder.Services.AddCustomServices();
+builder.Services.AddCustomRateLimiter();
+builder.Services.AddCustomJwtSecurity(builder.Configuration);
+
+builder.Services.AddOptions<EmailSettings>()
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
 
 builder.WebHost.ConfigureKestrel(options =>
 {
@@ -123,20 +82,29 @@ builder.WebHost.ConfigureKestrel(options =>
     //     {
     //         listenOptions.UseHttps();
     //     });
-    
 });
-
-LoggingConfiguration.ConfigureLogging(builder);
 
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
-    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    
-    if (dbContext.Database.GetPendingMigrations().Any())
+    try
     {
-        dbContext.Database.Migrate();
+        var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+        
+        if (dbContext.Database.GetPendingMigrations().Any())
+        {
+            logger.LogInformation("Applying pending migrations...");
+            dbContext.Database.Migrate();
+            logger.LogInformation("Migrations applied successfully");
+        }
+    }
+    catch (Exception ex)
+    {
+        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred while migrating the database");
+        throw;
     }
 }
 
@@ -147,11 +115,14 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseSwagger();
+app.UseSecurityHeaders();
 app.UseMiddleware<AuthMiddleware>();
 app.UseMiddleware<ErrorHandlingMiddleware>();
 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "MoodTracker API v1.0"));
 
+// app.UseHttpsRedirection();
 app.MapHealthChecks("/health");
+app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
