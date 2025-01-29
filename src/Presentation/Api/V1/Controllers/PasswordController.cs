@@ -37,16 +37,5 @@ namespace MoodTracker_back.Presentation.Controllers
       }
       return Ok(new { success = true });
     }
-    
-    [HttpGet("redirect-resetpage")]
-    public IActionResult RedirectToResetPage([FromQuery] string token)
-    {
-      var isValidToken = _tokenService.ValidatePasswordResetToken(token);
-      if (!isValidToken.isValid)
-      {
-        return BadRequest("Invalid token");
-      }
-      return Redirect($"{Environment.GetEnvironmentVariable("WEB_APP_URL")}/change-password?token={token}");
-    }
   }
 }
