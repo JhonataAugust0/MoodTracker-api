@@ -10,7 +10,7 @@
 *Desenvolvida com arquitetura limpa e segurança de nível enterprise.*
 
 <p align="center">
-  <img src="https://github.com/JhonataAugust0/MoodTracker-back/blob/master/public/image.png?raw=true" width="800" alt="Dashboard Preview">
+  <img src="https://github.com/JhonataAugust0/MoodTracker-api/blob/master/public/image.png?raw=true" width="800" alt="Dashboard Preview">
 </p>
 
 ## 🌟 Objetivo do Projeto
