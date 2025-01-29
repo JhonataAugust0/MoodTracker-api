@@ -1,19 +1,13 @@
 using DotNetEnv;
-using System.Text;
-
 using Microsoft.OpenApi.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 
-using Domain.Interfaces;
 using Infrastructure.Middlewares;
 using Infrastructure.Data.Config;
-using MoodTracker_back.Application.Services;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using MoodTracker_back.Infrastructure.Logging;
 using MoodTracker_back.Infrastructure.Adapters;
 using MoodTracker_back.Infrastructure.Middlewares;
-using MoodTracker_back.Infrastructure.Data.Repositories;
 
 DotNetEnv.Env.Load();
 
@@ -25,59 +19,21 @@ builder.Configuration.AddEnvironmentVariables();
 builder.Configuration.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
 builder.Configuration.AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true);
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(connectionString));
+    options.UseNpgsql(connectionString)
+        .LogTo(Console.WriteLine, LogLevel.Information) // Log no console
+        .EnableSensitiveDataLogging());
 
-builder.Services.Configure<EmailSettings>(options =>
+LoggingConfiguration.ConfigureLogging(builder);
+builder.Services.AddSingleton(new EmailSettings 
 {
-    options.SmtpServer = Environment.GetEnvironmentVariable("SMTP_HOST") ?? string.Empty;
-    options.SmtpPort = int.Parse(Environment.GetEnvironmentVariable("SMTP_PORT") ?? "25");
-    options.SmtpUsername = Environment.GetEnvironmentVariable("USER") ?? string.Empty;
-    options.SmtpPassword = Environment.GetEnvironmentVariable("PASSWORD") ?? string.Empty;
-    options.FromEmail = Environment.GetEnvironmentVariable("FROM_ADDERS") ?? string.Empty;
-    options.FromName = "Your App Name";
-    options.UseSSL = false;
+    SmtpHost = Environment.GetEnvironmentVariable("SMTP_HOST") ?? "",
+    SmtpPort = Environment.GetEnvironmentVariable("SMTP_PORT") ?? "587",
+    UserEmail = Environment.GetEnvironmentVariable("SMTP_USER") ?? "",
+    Password = Environment.GetEnvironmentVariable("SMTP_PASSWORD") ?? "",
+    SenderName = Environment.GetEnvironmentVariable("SMTP_SENDER_NAME") ?? "MoodTracker"
 });
 
 builder.Services.AddSwaggerGen();
-builder.Services.AddControllers();
-builder.Services.AddHealthChecks();
-builder.Services.AddHttpContextAccessor();
-builder.Services.AddEndpointsApiExplorer();
-
-builder.Services.AddTransient<IEmailService, Smtp>();
-builder.Services.AddScoped<ITagService, TagService>();
-builder.Services.AddScoped<IMoodService, MoodService>();
-builder.Services.AddScoped<IUserService, UserService>(); 
-builder.Services.AddScoped<IHabitService, HabitService>();
-builder.Services.AddScoped<ILoggingService, LoggingService>();
-builder.Services.AddScoped<ITagRepository, TagRepository>();
-builder.Services.AddScoped<IMoodRepository, MoodRepository>();
-builder.Services.AddScoped<IUserRepository, UserRepository>(); 
-builder.Services.AddScoped<ITokenService, JwtTokenGenerator>();
-builder.Services.AddScoped<IPasswordService, PasswordService>();
-builder.Services.AddScoped<IHabitRepository, HabitRepository>();
-builder.Services.AddScoped<IQuickNotesService, QuickNotesService>();
-builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
-builder.Services.AddScoped<IQuickNoteRepository, QuickNotesRepository>();
-builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
-builder.Services.AddScoped<IHabitCompletionRepository, HabitCompletionCompletionRepository>();
-
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters()
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = Environment.GetEnvironmentVariable("JWT_ISSUER"),
-            ValidAudience = Environment.GetEnvironmentVariable("JWT_AUDIENCE"),
-            IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT_KEY")!))
-        };
-    });
-
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "MoodTracker API", Version = "v1" });
@@ -105,37 +61,69 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+builder.Services.AddControllers();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddHealthChecks()
+    .AddDbContextCheck<ApplicationDbContext>();
+
+builder.Services.AddCustomCors();
+builder.Services.AddCustomServices();
+builder.Services.AddCustomRateLimiter();
+builder.Services.AddCustomJwtSecurity(builder.Configuration);
+
+builder.Services.AddOptions<EmailSettings>()
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+
 builder.WebHost.ConfigureKestrel(options =>
 {
     options.ListenAnyIP(5000);
+    // options.ListenAnyIP(5001, listenOptions =>
+    //     {
+    //         listenOptions.UseHttps();
+    //     });
 });
-
-LoggingConfiguration.ConfigureLogging(builder);
 
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
-    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    
-    if (dbContext.Database.GetPendingMigrations().Any())
+    try
     {
-        dbContext.Database.Migrate();
+        var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+        
+        if (dbContext.Database.GetPendingMigrations().Any())
+        {
+            logger.LogInformation("Applying pending migrations...");
+            dbContext.Database.Migrate();
+            logger.LogInformation("Migrations applied successfully");
+        }
+    }
+    catch (Exception ex)
+    {
+        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred while migrating the database");
+        throw;
     }
 }
 
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
-    app.UseCors();
+    app.UseCors("AllowFrontend");
 }
 
 app.UseSwagger();
+app.UseSecurityHeaders(app.Environment);
 app.UseMiddleware<AuthMiddleware>();
 app.UseMiddleware<ErrorHandlingMiddleware>();
 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "MoodTracker API v1.0"));
 
+// app.UseHttpsRedirection();
 app.MapHealthChecks("/health");
+app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
