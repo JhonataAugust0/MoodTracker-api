@@ -19,7 +19,9 @@ builder.Configuration.AddEnvironmentVariables();
 builder.Configuration.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
 builder.Configuration.AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true);
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(connectionString));
+    options.UseNpgsql(connectionString)
+        .LogTo(Console.WriteLine, LogLevel.Information) // Log no console
+        .EnableSensitiveDataLogging());
 
 LoggingConfiguration.ConfigureLogging(builder);
 builder.Services.AddSingleton(new EmailSettings 
@@ -31,13 +33,7 @@ builder.Services.AddSingleton(new EmailSettings
     SenderName = Environment.GetEnvironmentVariable("SMTP_SENDER_NAME") ?? "MoodTracker"
 });
 
-builder.Services.AddControllers();
-builder.Services.AddHttpContextAccessor();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddHealthChecks()
-    .AddDbContextCheck<ApplicationDbContext>();
-
-
+builder.Services.AddSwaggerGen();
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "MoodTracker API", Version = "v1" });
@@ -65,6 +61,11 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+builder.Services.AddControllers();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddHealthChecks()
+    .AddDbContextCheck<ApplicationDbContext>();
 
 builder.Services.AddCustomCors();
 builder.Services.AddCustomServices();
@@ -115,7 +116,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseSwagger();
-app.UseSecurityHeaders();
+app.UseSecurityHeaders(app.Environment);
 app.UseMiddleware<AuthMiddleware>();
 app.UseMiddleware<ErrorHandlingMiddleware>();
 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "MoodTracker API v1.0"));

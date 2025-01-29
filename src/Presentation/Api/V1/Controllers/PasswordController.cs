@@ -10,10 +10,12 @@ namespace MoodTracker_back.Presentation.Controllers
   public class PasswordController : ControllerBase
   {
     private readonly IPasswordService _passwordService;
+    private readonly ITokenService _tokenService;
 
-    public PasswordController(IPasswordService passwordService)
+    public PasswordController(IPasswordService passwordService, ITokenService tokenService)
     {
       _passwordService = passwordService;
+      _tokenService = tokenService;
     }
 
     [HttpPost("forgot")]
@@ -39,6 +41,11 @@ namespace MoodTracker_back.Presentation.Controllers
     [HttpGet("redirect-resetpage")]
     public IActionResult RedirectToResetPage([FromQuery] string token)
     {
+      var isValidToken = _tokenService.ValidatePasswordResetToken(token);
+      if (!isValidToken.isValid)
+      {
+        return BadRequest("Invalid token");
+      }
       return Redirect($"{Environment.GetEnvironmentVariable("WEB_APP_URL")}/change-password?token={token}");
     }
   }

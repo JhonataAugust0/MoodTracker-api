@@ -34,20 +34,26 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
-    public static IApplicationBuilder UseSecurityHeaders(this IApplicationBuilder app)
+    public static IApplicationBuilder UseSecurityHeaders(this IApplicationBuilder app, IWebHostEnvironment env)
     {
-        var csp = "default-src 'self'; " +
-                  "script-src 'self'; " +
-                  "style-src 'self'; " +
-                  "img-src 'self' data:; " +
-                  "connect-src 'self'; " +
-                  "frame-src 'none'; " +
-                  "base-uri 'self'; " +
-                  "form-action 'self';";
+        var csp = env.IsDevelopment()
+          ? "default-src 'self'; " +
+            "script-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
+            "style-src 'self' 'unsafe-inline'; " +
+            "img-src 'self' data:; " +
+            "connect-src 'self'; " +
+            "font-src 'self'; " +
+            "frame-src 'self';"
+          : "default-src 'self'; " + 
+            "script-src 'self'; " +
+            "style-src 'self'; " +
+            "img-src 'self' data:; " +
+            "connect-src 'self'; " +
+            "frame-src 'none';";
 
         app.Use(async (context, next) =>
         {
-            context.Response.Headers.Append("X-Frame-Options", "DENY");
+            context.Response.Headers.Append("X-Frame-Options", env.IsDevelopment() ? "SAMEORIGIN" : "DENY");
             context.Response.Headers.Append("X-Content-Type-Options", "nosniff");
             context.Response.Headers.Append("X-XSS-Protection", "1; mode=block");
             context.Response.Headers.Append("Content-Security-Policy", csp);

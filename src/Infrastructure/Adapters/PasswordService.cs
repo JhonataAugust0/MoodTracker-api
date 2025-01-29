@@ -79,17 +79,10 @@ public class PasswordService : IPasswordService
         var user = await _userRepository.GetByEmailAsync(email);
         if (user == null) return false;
 
-        var parts = user.PasswordHash.Split(':');
-        var hash = parts[0];
-        var salt = parts[1];
-
-        if (!VerifyPassword(password, hash, salt))
-        {
-            return false;
-        }
+        var tokenIsValid = _tokenService.ValidatePasswordResetToken(token);
+        if (!tokenIsValid.isValid) return false;
         
         var resetToken = await _resetTokenRepository.GetValidTokenAsync(user.Id, token);
-        if (resetToken == null) return false;
 
         await _resetTokenRepository.MarkAsUsedAsync(resetToken);
 
