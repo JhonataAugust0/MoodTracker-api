@@ -59,6 +59,15 @@ public class UserService : IUserService
         return await _userRepository.GetUserByRefreshTokenAsync(refreshToken);
     }
 
+    public async Task<IEnumerable<User>> GetInactiveUsers(CancellationToken stoppingToken)
+    {
+        return await _userRepository.GetInactiveUsers(stoppingToken);
+    }
+    
+    public async Task UpdateUserLastNotifiedAsync(int userId, DateTime lastNotified, CancellationToken stoppingToken)
+    {
+        await _userRepository.UpdateLastNotifiedAsync(userId, lastNotified, stoppingToken);
+    }
     public async Task UpdateUserAsync(User user)
     {
         await _userRepository.UpdateAsync(user);

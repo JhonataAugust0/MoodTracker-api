@@ -10,12 +10,14 @@ namespace MoodTracker_back.Infrastructure.Adapters;
 public class MoodService : IMoodService
 {
     private readonly IMoodRepository _moodRepository;
+    private readonly IUserService _userService;
     private readonly ITagRepository _tagRepository;
 
-    public MoodService(IMoodRepository moodRepository, ITagRepository tagRepository)
+    public MoodService(IMoodRepository moodRepository, ITagRepository tagRepository, IUserService userService)
     {
         _moodRepository = moodRepository;
         _tagRepository = tagRepository;
+        _userService = userService;
     }
     
     public async Task<MoodDto> GetByIdAsync(int id, int userId)
@@ -50,8 +52,14 @@ public class MoodService : IMoodService
             MoodType = createMoodDto.MoodType,
             Intensity = createMoodDto.Intensity,
             Notes = createMoodDto.Notes,
-            Timestamp = createMoodDto.Timestamp ?? DateTimeOffset.UtcNow
+            Timestamp = createMoodDto.Timestamp ?? DateTimeOffset.UtcNow,
         };
+
+        var user = await _userService.GetUserByIdAsync(userId);
+        user.LastMoodEntry = createMoodDto.Timestamp ?? DateTimeOffset.UtcNow;
+        user.LastLogin = createMoodDto.Timestamp ?? DateTimeOffset.UtcNow;
+        user.LastNotified = createMoodDto.Timestamp ?? DateTimeOffset.UtcNow;
+        await _userService.UpdateUserAsync(user);
 
         if (createMoodDto.TagIds.Any())
         {

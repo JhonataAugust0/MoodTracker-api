@@ -9,6 +9,8 @@ public interface IUserService
     Task<User?> GetUserByEmailAsync(string email);
     Task<User?> GetUserByRefreshTokenAsync(string refreshToken);
     Task<bool> EmailExistsAsync(string email);
+    Task<IEnumerable<User>> GetInactiveUsers(CancellationToken stoppingToken);
+    Task UpdateUserLastNotifiedAsync(int userId, DateTime lastNotified, CancellationToken stoppingToken);
     Task UpdateUserAsync(User user);
     Task DeleteUserAsync(int id);
 }

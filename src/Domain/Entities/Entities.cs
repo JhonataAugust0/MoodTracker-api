@@ -20,6 +20,8 @@ namespace Domain.Entities
         public DateTimeOffset UpdatedAt { get; set; } = DateTimeOffset.UtcNow;
         public DateTimeOffset? LastLogin { get; set; }
         public bool IsActive { get; set; } = true;
+        public DateTimeOffset LastMoodEntry { get; set; }
+        public DateTimeOffset? LastNotified { get; set; }
 
         public ICollection<Tag> Tags { get; set; } = new List<Tag>();
         public ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();

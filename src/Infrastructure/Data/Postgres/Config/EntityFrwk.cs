@@ -1,7 +1,7 @@
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace Infrastructure.Data.Config
+namespace MoodTracker_back.Infrastructure.Data.Postgres.Config
 {
     public class ApplicationDbContext : DbContext
     {

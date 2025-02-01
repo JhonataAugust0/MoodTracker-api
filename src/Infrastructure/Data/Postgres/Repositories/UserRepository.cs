@@ -1,9 +1,9 @@
 using Domain.Entities;
 using Domain.Interfaces;
-using Infrastructure.Data.Config;
+using MoodTracker_back.Infrastructure.Data.Postgres.Config;
 using Microsoft.EntityFrameworkCore;
 
-namespace MoodTracker_back.Infrastructure.Data.Repositories;
+namespace MoodTracker_back.Infrastructure.Data.Postgres.Repositories;
 
 public class UserRepository : IUserRepository
 {
@@ -35,6 +35,25 @@ public class UserRepository : IUserRepository
             .FirstOrDefaultAsync(u => u.RefreshTokens.Any(rt => rt.Token == refreshToken));
     }
 
+    public async Task<IEnumerable<User>> GetInactiveUsers(CancellationToken stoppingToken)
+    {
+        var cutoff = DateTime.UtcNow.AddDays(-3);
+        return await _context.Users
+            .Where(u => u.LastMoodEntry < cutoff &&
+                        (!u.LastNotified.HasValue || u.LastNotified < cutoff))
+            .ToListAsync(stoppingToken);
+    }
+
+    public async Task UpdateLastNotifiedAsync(int userId, DateTime lastNotified, CancellationToken stoppingToken)
+    {
+        var user = await _context.Users.FindAsync(new object[] { userId }, stoppingToken);
+        if (user != null)
+        {
+            user.LastNotified = lastNotified;
+            await _context.SaveChangesAsync(stoppingToken);
+        }
+    }
+    
     public async Task CreateAsync(User user)
     {
         _context.Users.Add(user);

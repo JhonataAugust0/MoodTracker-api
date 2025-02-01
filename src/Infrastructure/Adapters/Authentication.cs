@@ -60,7 +60,9 @@ public class AuthenticationService : IAuthenticationService
         {
             Success = true,
             Token = "Bearer " + token,
-            RefreshToken = refreshToken
+            RefreshToken = refreshToken,
+            UserId = user.Id,
+            UserEmail = user.Email
         };
     }
 

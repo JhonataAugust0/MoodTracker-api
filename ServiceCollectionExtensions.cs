@@ -7,7 +7,7 @@ using Domain.Interfaces;
 using MoodTracker_back.Application.Services;
 using MoodTracker_back.Infrastructure.Logging;
 using MoodTracker_back.Infrastructure.Adapters;
-using MoodTracker_back.Infrastructure.Data.Repositories;
+using MoodTracker_back.Infrastructure.Data.Postgres.Repositories;
 
 public static class ServiceCollectionExtensions
 {
@@ -31,6 +31,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IAuthenticationService, AuthenticationService>();
         services.AddScoped<IPasswordResetTokenRepository, PasswordResetTokenRepository>();
         services.AddScoped<IHabitCompletionRepository, HabitCompletionCompletionRepository>();
+
         return services;
     }
 

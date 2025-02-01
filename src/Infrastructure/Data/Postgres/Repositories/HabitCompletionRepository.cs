@@ -1,9 +1,9 @@
 using Domain.Entities;
 using Domain.Interfaces;
-using Infrastructure.Data.Config;
+using MoodTracker_back.Infrastructure.Data.Postgres.Config;
 using Microsoft.EntityFrameworkCore;
 
-namespace MoodTracker_back.Infrastructure.Data.Repositories;
+namespace MoodTracker_back.Infrastructure.Data.Postgres.Repositories;
 
 
 public class HabitCompletionCompletionRepository : IHabitCompletionRepository

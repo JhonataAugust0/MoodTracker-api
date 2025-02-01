@@ -3,11 +3,14 @@ using Microsoft.OpenApi.Models;
 using Microsoft.EntityFrameworkCore;
 
 using Infrastructure.Middlewares;
-using Infrastructure.Data.Config;
+using Microsoft.AspNetCore.SignalR;
+using MoodTracker_back.Infrastructure.Data.Postgres.Config;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using MoodTracker_back.Infrastructure.Logging;
 using MoodTracker_back.Infrastructure.Adapters;
 using MoodTracker_back.Infrastructure.Middlewares;
+using MoodTracker_back.Application.Services;
+using StackExchange.Redis;
 
 DotNetEnv.Env.Load();
 
@@ -19,8 +22,8 @@ builder.Configuration.AddEnvironmentVariables();
 builder.Configuration.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
 builder.Configuration.AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true);
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(connectionString)
-        .LogTo(Console.WriteLine, LogLevel.Information) // Log no console
+    options.UseNpgsql("Host=moodtracker-db;Database=moodtrackerdb;Username=postgres;Password=postgres")
+        .LogTo(Console.WriteLine, LogLevel.Information)
         .EnableSensitiveDataLogging());
 
 LoggingConfiguration.ConfigureLogging(builder);
@@ -32,6 +35,11 @@ builder.Services.AddSingleton(new EmailSettings
     Password = Environment.GetEnvironmentVariable("SMTP_PASSWORD") ?? "",
     SenderName = Environment.GetEnvironmentVariable("SMTP_SENDER_NAME") ?? "MoodTracker"
 });
+
+builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(Environment.GetEnvironmentVariable("REDIS_CONNECTION_STRING")));
+builder.Services.AddSingleton<NotificationHub>();
+builder.Services.AddSingleton<IRedisService, RedisService>();
+builder.Services.AddSingleton<IHostedService, InactivityCheckService>();
 
 builder.Services.AddSwaggerGen();
 builder.Services.AddSwaggerGen(c =>
@@ -65,7 +73,10 @@ builder.Services.AddControllers();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddHealthChecks()
-    .AddDbContextCheck<ApplicationDbContext>();
+    .AddDbContextCheck<ApplicationDbContext>()
+    .AddRedis(Environment.GetEnvironmentVariable("REDIS_CONNECTION_STRING"), 
+        name: "redis", 
+        failureStatus: HealthStatus.Unhealthy);
 
 builder.Services.AddCustomCors();
 builder.Services.AddCustomServices();
@@ -75,6 +86,8 @@ builder.Services.AddCustomJwtSecurity(builder.Configuration);
 builder.Services.AddOptions<EmailSettings>()
     .ValidateDataAnnotations()
     .ValidateOnStart();
+
+builder.Services.AddSignalR();
 
 builder.WebHost.ConfigureKestrel(options =>
 {
@@ -93,6 +106,8 @@ using (var scope = app.Services.CreateScope())
     {
         var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
         var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+        var signalR = scope.ServiceProvider.GetRequiredService<IHubContext<NotificationHub>>();
+        var redis = scope.ServiceProvider.GetRequiredService<IRedisService>();
         
         if (dbContext.Database.GetPendingMigrations().Any())
         {
@@ -120,7 +135,7 @@ app.UseSecurityHeaders(app.Environment);
 app.UseMiddleware<AuthMiddleware>();
 app.UseMiddleware<ErrorHandlingMiddleware>();
 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "MoodTracker API v1.0"));
-
+app.MapHub<NotificationHub>("/notificationHub");
 // app.UseHttpsRedirection();
 app.MapHealthChecks("/health");
 app.UseRouting();
