@@ -1,9 +1,8 @@
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MoodTracker_back.Application.Services;
+using MoodTracker_back.Application.Interfaces;
 using MoodTracker_back.Presentation.Api.V1.Dtos;
 
-namespace MoodTracker_back.Presentation.Controllers
+namespace MoodTracker_back.Presentation.Api.V1.Controllers
 {
   [ApiController]
   [Route("api/password")]

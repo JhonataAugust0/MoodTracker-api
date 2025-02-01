@@ -2,35 +2,40 @@ using System.Text;
 using System.Threading.RateLimiting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-
-using Domain.Interfaces;
+using MoodTracker_back.Application.Interfaces;
 using MoodTracker_back.Application.Services;
+using MoodTracker_back.Domain.Interfaces;
 using MoodTracker_back.Infrastructure.Logging;
 using MoodTracker_back.Infrastructure.Adapters;
-using MoodTracker_back.Infrastructure.Data.Repositories;
+using MoodTracker_back.Infrastructure.Adapters.Security;
+using MoodTracker_back.Infrastructure.Adapters.Smtp;
+using MoodTracker_back.Infrastructure.Data.Postgres.Repositories;
+
+namespace MoodTracker_back;
 
 public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddCustomServices(this IServiceCollection services)
     {
-        services.AddTransient<IEmailService, Smtp>();
-        services.AddScoped<ITagService, TagService>();
-        services.AddScoped<IMoodService, MoodService>();
-        services.AddScoped<IUserService, UserService>();
+        services.AddTransient<IEmailService, SmtpService>();
+        services.AddScoped<ITagService, TagAppService>();
+        services.AddScoped<IMoodService, MoodAppService>();
+        services.AddScoped<IUserService, UserAppService>();
         services.AddScoped<ITokenService, TokenService>();
-        services.AddScoped<IHabitService, HabitService>();
+        services.AddScoped<IHabitService, HabitAppService>();
         services.AddScoped<ITagRepository, TagRepository>();
         services.AddScoped<ILoggingService, LoggingService>();
         services.AddScoped<IMoodRepository, MoodRepository>();
         services.AddScoped<IUserRepository, UserRepository>(); 
         services.AddScoped<IPasswordService, PasswordService>();
         services.AddScoped<IHabitRepository, HabitRepository>();
-        services.AddScoped<IQuickNotesService, QuickNotesService>();
-        services.AddScoped<ICurrentUserService, CurrentUserService>();
+        services.AddScoped<IQuickNotesService, QuickNotesAppService>();
+        services.AddScoped<ICurrentUserService, CurrentUserAppService>();
         services.AddScoped<IQuickNoteRepository, QuickNotesRepository>();
-        services.AddScoped<IAuthenticationService, AuthenticationService>();
+        services.AddScoped<IAuthenticationService, AuthenticationAppService>();
         services.AddScoped<IPasswordResetTokenRepository, PasswordResetTokenRepository>();
         services.AddScoped<IHabitCompletionRepository, HabitCompletionCompletionRepository>();
+
         return services;
     }
 

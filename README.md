@@ -5,12 +5,13 @@
 [![Docker](https://img.shields.io/badge/Docker-24.0-2496ED?logo=docker)](https://www.docker.com/)
 [![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 [![Swagger](https://img.shields.io/badge/Swagger-3.0-85EA2D?logo=swagger)](https://swagger.io/)
+[![Redis](https://img.shields.io/badge/redis-%23DD0031.svg?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io)
 
 **API robusta e escalável para gerenciamento de bem-estar emocional e hábitos.**  
 *Desenvolvida com arquitetura limpa e segurança de nível enterprise.*
 
 <p align="center">
-  <img src="https://github.com/JhonataAugust0/MoodTracker-api/blob/master/public/image.png?raw=true" width="800" alt="Dashboard Preview">
+  <img src="https://raw.githubusercontent.com/JhonataAugust0/MoodTracker-api/refs/heads/master/public/image.png" width="800" alt="Dashboard Preview">
 </p>
 
 ## 🌟 Objetivo do Projeto
@@ -29,18 +30,25 @@ O **MoodTracker** é uma aplicação inovadora projetada para ajudar os usuário
 - **Gestão de Hábitos**: CRUD completo com tracking de streaks e métricas.
 - **Análise de Dados**: Agregação de dados para insights semanais/mensais.
 
+### 🔔 Notificações Inteligentes com Redis
+
+- **Lembretes de Atividade**: Receba e-mails amigáveis após 3 dias de inatividade, incentivando você a continuar sua jornada.
+- **Notificações Offline**: Se você estiver desconectado, as notificações são armazenadas no Redis e entregues assim que retornar ao app.
+- **Escalabilidade**: O Redis permite milhares de notificações simultâneas sem impactar a performance.
+
 ### ⚙️ Infraestrutura
 - **Migrations Automatizadas**: EF Core com histórico de alterções versionado.
 - **Health Checks**: Monitoramento de dependências (DB).
 
 ## 📦 Stack Tecnológica
 
-| Camada              | Tecnologias                                                                 |
-|---------------------|-----------------------------------------------------------------------------|
-| **Core**            | .NET 8.0, C# 12, Entity Framework Core 8                                   |
-| **Banco de Dados**  | PostgreSQL 15            |
-| **Infra**           | Docker Compose, GitHub Actions CI/CD    |
-| **Segurança**       | JWT, ASP.NET Identity, Rate Limiting, CORS policies                        |
+| Camada              | Tecnologias                                           |
+|---------------------|-------------------------------------------------------|
+| **Core**            | .NET 8.0, C# 12, Entity Framework Core 8              |
+| **Banco de Dados**  | PostgreSQL 15                                         |
+| **Infra**           | Docker Compose, GitHub Actions CI/CD                  |
+| **Segurança**       | JWT, ASP.NET Identity, Rate Limiting, CORS policies   |
+| **Notificações**    | SignalR, Redis, System.Net.Mail                       |
 
 
 ## 📚 Documentação

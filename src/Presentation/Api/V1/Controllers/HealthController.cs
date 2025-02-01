@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace MoodTracker_back.Presentation.Controllers
+namespace MoodTracker_back.Presentation.Api.V1.Controllers
 {
     [Authorize]
     [ApiController]

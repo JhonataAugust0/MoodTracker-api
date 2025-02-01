@@ -1,4 +1,4 @@
-namespace  Infrastructure.Middlewares;
+namespace MoodTracker_back.Infrastructure.Middlewares;
 
 public class AuthMiddleware
 {
