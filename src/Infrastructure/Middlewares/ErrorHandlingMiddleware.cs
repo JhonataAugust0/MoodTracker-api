@@ -1,5 +1,5 @@
 using System.Text.Json;
-using MoodTracker_back.Infrastructure.Exceptions;
+using MoodTracker_back.Domain.Exceptions;
 
 namespace MoodTracker_back.Infrastructure.Middlewares;
 

@@ -2,14 +2,17 @@ using DotNetEnv;
 using Microsoft.OpenApi.Models;
 using Microsoft.EntityFrameworkCore;
 
-using Infrastructure.Middlewares;
 using Microsoft.AspNetCore.SignalR;
 using MoodTracker_back.Infrastructure.Data.Postgres.Config;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using MoodTracker_back;
+using MoodTracker_back.Application.Interfaces;
 using MoodTracker_back.Infrastructure.Logging;
-using MoodTracker_back.Infrastructure.Adapters;
 using MoodTracker_back.Infrastructure.Middlewares;
 using MoodTracker_back.Application.Services;
+using MoodTracker_back.Infrastructure.Adapters.Notifications;
+using MoodTracker_back.Infrastructure.Adapters.Redis;
+using MoodTracker_back.Infrastructure.Adapters.Smtp;
 using StackExchange.Redis;
 
 DotNetEnv.Env.Load();
@@ -27,7 +30,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
         .EnableSensitiveDataLogging());
 
 LoggingConfiguration.ConfigureLogging(builder);
-builder.Services.AddSingleton(new EmailSettings 
+builder.Services.AddSingleton(new EmailSettings() 
 {
     SmtpHost = Environment.GetEnvironmentVariable("SMTP_HOST") ?? "",
     SmtpPort = Environment.GetEnvironmentVariable("SMTP_PORT") ?? "587",
@@ -39,7 +42,7 @@ builder.Services.AddSingleton(new EmailSettings
 builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(Environment.GetEnvironmentVariable("REDIS_CONNECTION_STRING")));
 builder.Services.AddSingleton<NotificationHub>();
 builder.Services.AddSingleton<IRedisService, RedisService>();
-builder.Services.AddSingleton<IHostedService, InactivityCheckService>();
+builder.Services.AddSingleton<IHostedService, CheckInactivityAppService>();
 
 builder.Services.AddSwaggerGen();
 builder.Services.AddSwaggerGen(c =>

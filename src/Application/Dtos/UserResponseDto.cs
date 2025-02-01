@@ -1,4 +1,4 @@
-namespace Application.Dtos;
+namespace MoodTracker_back.Application.Dtos;
 
 
 public class UserResponseDto

@@ -1,5 +1,5 @@
-using MoodTracker_back.Application.Services;
 using MoodTracker_back.Application.Common.Abstractions;
+using MoodTracker_back.Application.Interfaces;
 
 namespace MoodTracker_back.Infrastructure.Logging;
 

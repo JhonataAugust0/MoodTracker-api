@@ -1,6 +1,6 @@
 using Domain.Entities;
 
-namespace Domain.Interfaces;
+namespace MoodTracker_back.Domain.Interfaces;
 
 
 public interface IQuickNoteRepository

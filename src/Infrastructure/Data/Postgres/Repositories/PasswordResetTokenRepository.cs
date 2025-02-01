@@ -1,5 +1,5 @@
 using Domain.Entities;
-using Domain.Interfaces;
+using MoodTracker_back.Domain.Interfaces;
 using MoodTracker_back.Infrastructure.Data.Postgres.Config;
 using Microsoft.EntityFrameworkCore;
 
