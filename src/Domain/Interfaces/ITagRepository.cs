@@ -1,11 +1,10 @@
-using Domain.Entities;
+using MoodTracker_back.Domain.Entities;
 
 namespace MoodTracker_back.Domain.Interfaces;
 
 public interface ITagRepository
 {
     Task<Tag> GetByIdAsync(int id);
-    Task<IEnumerable<Tag>> GetByUserIdAsync(int userId);
     Task CreateAsync(Tag tag);
     Task UpdateAsync(Tag tag);
     Task DeleteAsync(int id);

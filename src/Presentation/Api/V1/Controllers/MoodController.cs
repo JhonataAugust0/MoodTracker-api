@@ -30,32 +30,57 @@ namespace MoodTracker_back.Presentation.Api.V1.Controllers
             }
             catch (NotFoundException)
             {
-                return NotFound();
+                return NotFound("Mood not found");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
             }
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<MoodDto>>> GetUserMoods()
         {
-            var moods = await _moodService.GetUserMoodsAsync(_currentUserService.UserId);
-            return Ok(moods);
+            try
+            {
+                var moods = await _moodService.GetUserMoodsAsync(_currentUserService.UserId);
+                return Ok(moods);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
-        
+
         [HttpGet("history")]
         public async Task<ActionResult<IEnumerable<HabitDto>>> GetUserMoodHistory(
             [FromQuery] int moodId,
-            [FromQuery] DateTimeOffset? startDate, 
+            [FromQuery] DateTimeOffset? startDate,
             [FromQuery] DateTimeOffset? endDate)
         {
-            var habits = await _moodService.GetUserMoodHistoryAsync(moodId, startDate, endDate);
-            return Ok(habits);
+            try
+            {
+                var habits = await _moodService.GetUserMoodHistoryAsync(moodId, startDate, endDate);
+                return Ok(habits);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
         [HttpPost]
         public async Task<ActionResult<MoodDto>> CreateMood(CreateMoodDto createMoodDto)
         {
-            var mood = await _moodService.CreateMoodAsync(_currentUserService.UserId, createMoodDto);
-            return CreatedAtAction(nameof(GetMood), new { id = mood.Id }, mood);
+            try
+            {
+                var mood = await _moodService.CreateMoodAsync(_currentUserService.UserId, createMoodDto);
+                return CreatedAtAction(nameof(GetMood), new { id = mood.Id }, mood);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
         [HttpPut("{id}")]
@@ -68,7 +93,11 @@ namespace MoodTracker_back.Presentation.Api.V1.Controllers
             }
             catch (NotFoundException)
             {
-                return NotFound();
+                return NotFound("Mood not found");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
             }
         }
 
@@ -82,7 +111,11 @@ namespace MoodTracker_back.Presentation.Api.V1.Controllers
             }
             catch (NotFoundException)
             {
-                return NotFound();
+                return NotFound("Mood not found");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
             }
         }
     }
