@@ -22,8 +22,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IMoodService, MoodAppService>();
         services.AddScoped<IUserService, UserAppService>();
         services.AddScoped<ITokenService, TokenService>();
-        services.AddScoped<IHabitService, HabitAppService>();
         services.AddScoped<ITagRepository, TagRepository>();
+        services.AddScoped<IHabitService, HabitAppService>();
         services.AddScoped<ILoggingService, LoggingService>();
         services.AddScoped<IMoodRepository, MoodRepository>();
         services.AddScoped<IUserRepository, UserRepository>(); 

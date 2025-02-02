@@ -1,5 +1,5 @@
 using System.ComponentModel.DataAnnotations;
-using Domain.Entities;
+using MoodTracker_back.Domain.Entities;
 
 namespace MoodTracker_back.Presentation.Api.V1.Dtos;
 

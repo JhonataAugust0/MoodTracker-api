@@ -1,4 +1,4 @@
-using Domain.Entities;
+using MoodTracker_back.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace MoodTracker_back.Infrastructure.Data.Postgres.Config

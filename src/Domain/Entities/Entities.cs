@@ -1,4 +1,4 @@
-namespace Domain.Entities
+namespace MoodTracker_back.Domain.Entities
 {
     public enum FrequencyType
     {

@@ -9,32 +9,42 @@ namespace MoodTracker_back.Presentation.Api.V1.Controllers
   public class PasswordController : ControllerBase
   {
     private readonly IPasswordService _passwordService;
-    private readonly ITokenService _tokenService;
 
-    public PasswordController(IPasswordService passwordService, ITokenService tokenService)
+    public PasswordController(IPasswordService passwordService)
     {
       _passwordService = passwordService;
-      _tokenService = tokenService;
     }
 
     [HttpPost("forgot")]
     public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequestDTO request)
     {
-      var result = await _passwordService.RequestPasswordResetAsync(request.Email);
-      if (!result)
-        return BadRequest("Não foi possível processar sua solicitação");
-      return Ok(new { success = result, message = "Email de recuperação enviado com sucesso"});
+      try
+      {
+        var result = await _passwordService.RequestPasswordResetAsync(request.Email);
+        if (!result)
+          return BadRequest(new { error = "Não foi possível processar sua solicitação" });
+        return Ok(new { success = result, message = "Email de recuperação enviado com sucesso" });
+      }
+      catch (Exception ex)
+      {
+        return StatusCode(500, new { error = ex.Message });
+      }
     }
 
     [HttpPost("change")]
     public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequestDTO request)
     {
-      var result = await _passwordService.ChangePasswordAsync(request.Email, request.Token, request.Password, request.NewPassword);
-      if (!result)
+      try
       {
-        return Unauthorized(new {success = false, message = "Usuário não encontrado ou token inválido"});
+        var result = await _passwordService.ChangePasswordAsync(request.Email, request.Token, request.Password, request.NewPassword);
+        if (!result)
+          return Unauthorized(new { success = false, message = "Usuário não encontrado ou token inválido" });
+        return Ok(new { success = true });
       }
-      return Ok(new { success = true });
+      catch (Exception ex)
+      {
+        return StatusCode(500, new { error = ex.Message });
+      }
     }
   }
 }

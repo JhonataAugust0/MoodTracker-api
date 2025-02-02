@@ -1,9 +1,8 @@
-
 using System.Security.Claims;
 using MoodTracker_back.Application.Interfaces;
+using Microsoft.AspNetCore.Http;
 
 namespace MoodTracker_back.Infrastructure.Adapters;
-
 
 public class CurrentUserAppService : ICurrentUserService
 {
@@ -11,35 +10,28 @@ public class CurrentUserAppService : ICurrentUserService
 
     public CurrentUserAppService(IHttpContextAccessor httpContextAccessor)
     {
-        _httpContextAccessor = httpContextAccessor;
+        _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
     }
 
     public int UserId
     {
         get
         {
-            var userIdClaim = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier);
+            var userIdClaim = GetClaim(ClaimTypes.NameIdentifier);
             if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
             {
-                throw new UnauthorizedAccessException("User is not authenticated or UserId claim is invalid");
+                throw new InvalidOperationException("User is not authenticated or UserId claim is invalid");
             }
             return userId;
         }
     }
 
-    public string? UserEmail
-    {
-        get
-        {
-            return _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.Email)?.Value;
-        }
-    }
+    public string? UserEmail => GetClaim(ClaimTypes.Email)?.Value;
 
-    public bool IsAuthenticated
+    public bool IsAuthenticated => _httpContextAccessor.HttpContext?.User.Identity?.IsAuthenticated ?? false;
+
+    private Claim? GetClaim(string claimType)
     {
-        get
-        {
-            return _httpContextAccessor.HttpContext?.User.Identity?.IsAuthenticated ?? false;
-        }
+        return _httpContextAccessor.HttpContext?.User.FindFirst(claimType);
     }
 }
