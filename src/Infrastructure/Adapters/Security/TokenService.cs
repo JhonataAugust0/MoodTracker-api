@@ -3,7 +3,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
-using Domain.Entities;
+using MoodTracker_back.Domain.Entities;
 using Microsoft.IdentityModel.Tokens;
 using MoodTracker_back.Application.Dtos;
 using MoodTracker_back.Application.Interfaces;
@@ -123,7 +123,6 @@ public class TokenService : ITokenService
             var json = reader.ReadToEnd();
             var tokenData = JsonSerializer.Deserialize<TokenData>(json);
 
-            // Validações explícitas
             if (tokenData == null || 
                 tokenData.UserId <= 0 || 
                 string.IsNullOrEmpty(tokenData.Email) || 
@@ -136,7 +135,6 @@ public class TokenService : ITokenService
         }
         catch (Exception ex)
         {
-            // Logar o erro para diagnóstico
             Console.WriteLine($"Erro ao validar token: {ex.Message}");
             return (false, 0, string.Empty);
         }

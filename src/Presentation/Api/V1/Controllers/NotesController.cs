@@ -26,40 +26,62 @@ namespace MoodTracker_back.Presentation.Api.V1.Controllers
         {
             try
             {
-                var tag = await _notesService.GetNoteByIdAsync(id, _currentUserService.UserId);
-                return Ok(tag);
+                var note = await _notesService.GetNoteByIdAsync(id, _currentUserService.UserId);
+                return Ok(note);
             }
             catch (NotFoundException)
             {
                 return NotFound("Note not found");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
             }
         }
         
         [HttpGet]
         public async Task<ActionResult<IEnumerable<QuickNoteDto>>> GetUserNotes()
         {
-            var tags = await _notesService.GetUserNotesAsync(_currentUserService.UserId);
-            return Ok(tags);
+            try
+            {
+                var notes = await _notesService.GetUserNotesAsync(_currentUserService.UserId);
+                return Ok(notes);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
         [HttpPost]
-        public async Task<ActionResult<QuickNoteDto>> CreateNote(CreateQuickNoteDto createQuickNoteDto)
-        {
-            var tag = await _notesService.CreateNoteAsync(_currentUserService.UserId, createQuickNoteDto);
-            return CreatedAtAction(nameof(GetNote), new { id = tag.Id }, tag);
-        }
-
-        [HttpPut("{id}")]
-        public async Task<ActionResult<QuickNoteDto>> UpdateNote(int id, UpdateQuickNoteDto updateQuickNoteDto)
+        public async Task<ActionResult<QuickNoteDto>> CreateNote([FromBody] CreateQuickNoteDto createQuickNoteDto)
         {
             try
             {
-                var tag = await _notesService.UpdateNoteAsync(id, _currentUserService.UserId, updateQuickNoteDto);
-                return Ok(tag);
+                var note = await _notesService.CreateNoteAsync(_currentUserService.UserId, createQuickNoteDto);
+                return CreatedAtAction(nameof(GetNote), new { id = note.Id }, note);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [HttpPut("{id}")]
+        public async Task<ActionResult<QuickNoteDto>> UpdateNote(int id, [FromBody] UpdateQuickNoteDto updateQuickNoteDto)
+        {
+            try
+            {
+                var note = await _notesService.UpdateNoteAsync(id, _currentUserService.UserId, updateQuickNoteDto);
+                return Ok(note);
             }
             catch (NotFoundException)
             {
-                return NotFound();
+                return NotFound("Note not found");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
             }
         }
 
@@ -73,7 +95,11 @@ namespace MoodTracker_back.Presentation.Api.V1.Controllers
             }
             catch (NotFoundException)
             {
-                return NotFound();
+                return NotFound("Note not found");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
             }
         }
     }

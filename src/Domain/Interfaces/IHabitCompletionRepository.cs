@@ -1,4 +1,4 @@
-using Domain.Entities;
+using MoodTracker_back.Domain.Entities;
 
 namespace MoodTracker_back.Domain.Interfaces;
 

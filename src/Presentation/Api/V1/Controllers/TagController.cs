@@ -1,4 +1,4 @@
-using Domain.Entities;
+using MoodTracker_back.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MoodTracker_back.Application.Interfaces;
@@ -32,22 +32,36 @@ namespace MoodTracker_back.Presentation.Api.V1.Controllers
             }
             catch (NotFoundException)
             {
-                return NotFound("Tag not found");
+                return NotFound(new { error = "Tag not found" });
             }
         }
-        
+
         [HttpGet]
         public async Task<ActionResult<IEnumerable<TagDto>>> GetUserTags()
         {
-            var tags = await _tagService.GetUserTagsAsync(_currentUserService.UserId);
-            return Ok(tags);
+            try
+            {
+                var tags = await _tagService.GetUserTagsAsync(_currentUserService.UserId);
+                return Ok(tags);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = "An error occurred while fetching tags.", details = ex.Message });
+            }
         }
 
         [HttpPost]
         public async Task<ActionResult<TagDto>> CreateTag(CreateTagDto createTagDto)
         {
-            var tag = await _tagService.CreateTagAsync(_currentUserService.UserId, createTagDto);
-            return CreatedAtAction(nameof(GetTag), new { id = tag.Id }, tag);
+            try
+            {
+                var tag = await _tagService.CreateTagAsync(_currentUserService.UserId, createTagDto);
+                return CreatedAtAction(nameof(GetTag), new { id = tag.Id }, tag);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
         }
 
         [HttpPut("{id}")]
@@ -60,7 +74,11 @@ namespace MoodTracker_back.Presentation.Api.V1.Controllers
             }
             catch (NotFoundException)
             {
-                return NotFound();
+                return NotFound(new { error = "Tag not found" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
             }
         }
 
@@ -74,7 +92,11 @@ namespace MoodTracker_back.Presentation.Api.V1.Controllers
             }
             catch (NotFoundException)
             {
-                return NotFound();
+                return NotFound(new { error = "Tag not found" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = "An error occurred while deleting the tag.", details = ex.Message });
             }
         }
     }

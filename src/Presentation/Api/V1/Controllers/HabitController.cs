@@ -30,39 +30,59 @@ namespace MoodTracker_back.Presentation.Api.V1.Controllers
             }
             catch (NotFoundException)
             {
-                return NotFound();
+                return NotFound("Habit not found");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
             }
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<HabitDto>>> GetUserHabits()
         {
-            var habits = await _habitService.GetUserHabitsAsync(_currentUserService.UserId);
-            return Ok(habits);
+            try
+            {
+                var habits = await _habitService.GetUserHabitsAsync(_currentUserService.UserId);
+                return Ok(habits);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
-        
+
         [HttpGet("history")]
-        public async Task<ActionResult<IEnumerable<HabitDto>>> GetUserHistoryHabitCompletion([FromQuery] int habitId,
-            [FromQuery] DateTimeOffset? startDate, [FromQuery] DateTimeOffset? endDate)
+        public async Task<ActionResult<IEnumerable<HabitDto>>> GetUserHistoryHabitCompletion(
+            [FromQuery] int habitId, [FromQuery] DateTimeOffset? startDate, 
+            [FromQuery] DateTimeOffset? endDate
+        )
         {
-            var habits = await _habitService.GetUserHistoryHabitCompletionAsync(habitId, startDate, endDate);
-            return Ok(habits);
+            try
+            {
+                var habits = await _habitService.GetUserHistoryHabitCompletionAsync(habitId, startDate, endDate);
+                return Ok(habits);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
         [HttpPost("create")]
         public async Task<ActionResult<HabitDto>> CreateHabit(CreateHabitDto createHabitDto)
         {
-            var habit = await _habitService.CreateHabitAsync(_currentUserService.UserId, createHabitDto);
-            return CreatedAtAction(nameof(GetHabit), new { id = habit.Id }, habit);
+            try
+            {
+                var habit = await _habitService.CreateHabitAsync(_currentUserService.UserId, createHabitDto);
+                return CreatedAtAction(nameof(GetHabit), new { id = habit.Id }, habit);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
-        [HttpPost("log")]
-        public async Task<ActionResult<LogHabitCompletionDto>> Log(LogHabitCompletionDto logHabitDto)
-        {
-            var habit = await _habitService.LogHabitAsync(_currentUserService.UserId, logHabitDto);
-            return CreatedAtAction(nameof(GetHabit), new { id = habit.Id }, habit);
-        }
-        
         [HttpPut("{id}")]
         public async Task<ActionResult<HabitDto>> UpdateHabit(int id, UpdateHabitDto updateHabitDto)
         {
@@ -73,7 +93,11 @@ namespace MoodTracker_back.Presentation.Api.V1.Controllers
             }
             catch (NotFoundException)
             {
-                return NotFound();
+                return NotFound("Habit not found");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
             }
         }
 
@@ -87,7 +111,11 @@ namespace MoodTracker_back.Presentation.Api.V1.Controllers
             }
             catch (NotFoundException)
             {
-                return NotFound();
+                return NotFound("Habit not found");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
             }
         }
     }

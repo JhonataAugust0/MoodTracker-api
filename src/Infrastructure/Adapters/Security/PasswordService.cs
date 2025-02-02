@@ -1,6 +1,6 @@
 using System.Security.Cryptography;
 using System.Text;
-using Domain.Entities;
+using MoodTracker_back.Domain.Entities;
 using MoodTracker_back.Application.Interfaces;
 using MoodTracker_back.Domain.Interfaces;
 
