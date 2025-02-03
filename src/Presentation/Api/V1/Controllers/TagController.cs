@@ -50,7 +50,7 @@ namespace MoodTracker_back.Presentation.Api.V1.Controllers
             }
         }
 
-        [HttpPost,HttpOptions]
+        [HttpPost]
         public async Task<ActionResult<TagDto>> CreateTag(CreateTagDto createTagDto)
         {
             try

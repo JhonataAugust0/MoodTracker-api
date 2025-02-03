@@ -149,10 +149,6 @@ app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "MoodTracker
 app.MapHub<NotificationHub>("/notificationHub");
 // app.UseHttpsRedirection();
 app.MapHealthChecks("/health");
-app.UseRouting();
-app.UseCors("AllowFrontend");
-app.UseAuthentication();
-app.UseAuthorization();
 
 app.Map("/api", api =>
 {
@@ -167,6 +163,13 @@ app.Map("/api", api =>
         await next();
     });
 });
+
+app.UseRouting();
+app.UseCors("AllowFrontend");
+app.UseAuthentication();
+app.UseAuthorization();
+
+
 
 app.MapControllers();
 app.Run();

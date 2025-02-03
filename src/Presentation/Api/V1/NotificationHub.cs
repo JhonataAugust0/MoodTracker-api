@@ -41,7 +41,7 @@ namespace MoodTracker_back.Presentation.Api.V1.Controllers
             }
         }
 
-        [HttpPost("mark-read"), HttpOptions("mark-read")]
+        [HttpPost("mark-read")]
         public async Task<IActionResult> MarkNotificationsAsRead()
         {
             try
