@@ -139,7 +139,6 @@ using (var scope = app.Services.CreateScope())
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
-    app.UseCors("AllowFrontend");
 }
 
 app.UseSwagger();
@@ -151,8 +150,24 @@ app.MapHub<NotificationHub>("/notificationHub");
 // app.UseHttpsRedirection();
 app.MapHealthChecks("/health");
 app.UseRouting();
+app.UseCors("AllowFrontend");
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.Map("/api", api =>
+{
+    api.Use(async (context, next) =>
+    {
+        if (context.Request.Method == "OPTIONS")
+        {
+            context.Response.StatusCode = 200;
+            await context.Response.CompleteAsync();
+            return;
+        }
+        await next();
+    });
+});
+
 app.MapControllers();
 app.Run();
 
