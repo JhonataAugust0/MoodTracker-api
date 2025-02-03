@@ -39,7 +39,16 @@ builder.Services.AddSingleton(new EmailSettings()
     SenderName = Environment.GetEnvironmentVariable("SMTP_SENDER_NAME") ?? "MoodTracker"
 });
 
-builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(Environment.GetEnvironmentVariable("REDIS_CONNECTION_STRING")));
+builder.Services.AddSingleton<IConnectionMultiplexer>(
+    ConnectionMultiplexer.Connect(
+        new ConfigurationOptions{
+            EndPoints= { {Environment.GetEnvironmentVariable("REDIS_ENDPOINT"), int.Parse(Environment.GetEnvironmentVariable("REDIS_PORT") ?? "6379")} },
+            User=Environment.GetEnvironmentVariable("REDIS_USER"),
+            Password=Environment.GetEnvironmentVariable("REDIS_PASSWORD")
+        }
+    )
+);
+
 builder.Services.AddSingleton<NotificationHub>();
 builder.Services.AddSingleton<IRedisService, RedisService>();
 builder.Services.AddSingleton<IHostedService, CheckInactivityAppService>();
@@ -95,10 +104,10 @@ builder.Services.AddSignalR();
 builder.WebHost.ConfigureKestrel(options =>
 {
     options.ListenAnyIP(5000);
-    // options.ListenAnyIP(5001, listenOptions =>
-    //     {
-    //         listenOptions.UseHttps();
-    //     });
+    options.ListenAnyIP(5001, listenOptions =>
+        {
+            listenOptions.UseHttps();
+        });
 });
 
 var app = builder.Build();
@@ -139,7 +148,7 @@ app.UseMiddleware<AuthMiddleware>();
 app.UseMiddleware<ErrorHandlingMiddleware>();
 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "MoodTracker API v1.0"));
 app.MapHub<NotificationHub>("/notificationHub");
-// app.UseHttpsRedirection();
+app.UseHttpsRedirection();
 app.MapHealthChecks("/health");
 app.UseRouting();
 app.UseAuthentication();
