@@ -82,6 +82,24 @@ namespace MoodTracker_back.Presentation.Api.V1.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
+        
+        [HttpPost("log")]
+        public async Task<ActionResult<LogHabitCompletionDto>> Log(LogHabitCompletionDto logHabitDto)
+        {
+            try
+            {
+                var habit = await _habitService.LogHabitAsync(_currentUserService.UserId, logHabitDto);
+                return CreatedAtAction(nameof(GetHabit), new { id = habit.Id }, habit);
+            }
+            catch (NotFoundException)
+            {
+                return NotFound("Habit not found");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
 
         [HttpPut("{id}")]
         public async Task<ActionResult<HabitDto>> UpdateHabit(int id, UpdateHabitDto updateHabitDto)
