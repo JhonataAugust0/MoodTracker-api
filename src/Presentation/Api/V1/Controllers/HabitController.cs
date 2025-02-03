@@ -69,7 +69,7 @@ namespace MoodTracker_back.Presentation.Api.V1.Controllers
             }
         }
 
-        [HttpPost("create"), HttpOptions("create")]
+        [HttpPost("create")]
         public async Task<ActionResult<HabitDto>> CreateHabit(CreateHabitDto createHabitDto)
         {
             try
@@ -83,7 +83,7 @@ namespace MoodTracker_back.Presentation.Api.V1.Controllers
             }
         }
         
-        [HttpPost("log"),HttpOptions("log")]
+        [HttpPost("log")]
         public async Task<ActionResult<LogHabitCompletionDto>> Log(LogHabitCompletionDto logHabitDto)
         {
             try

@@ -15,7 +15,7 @@ namespace MoodTracker_back.Presentation.Api.V1.Controllers
       _passwordService = passwordService;
     }
 
-    [HttpPost("forgot"),HttpOptions("forgot")]
+    [HttpPost("forgot")]
     public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequestDTO request)
     {
       try
@@ -31,7 +31,7 @@ namespace MoodTracker_back.Presentation.Api.V1.Controllers
       }
     }
 
-    [HttpPost("change"),HttpOptions("change")]
+    [HttpPost("change")]
     public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequestDTO request)
     {
       try
