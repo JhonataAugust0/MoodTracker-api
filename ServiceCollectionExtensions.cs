@@ -50,7 +50,7 @@ public static class ServiceCollectionExtensions
             "font-src 'self'; " +
             "frame-src 'self';"
           : "default-src 'self'; " + 
-            "script-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
+            "script-src 'self'; " +
             "style-src 'self'; " +
             "img-src 'self' data:; " +
             "connect-src 'self'; " +
@@ -122,7 +122,7 @@ public static class ServiceCollectionExtensions
         {
             options.AddPolicy("AllowFrontend", policy =>
             {
-                policy.WithOrigins("https://mood-tracker-front-mpwb-b1cdno52q-jhonataaugust0s-projects.vercel.app")
+                policy.WithOrigins("https://mood-tracker-front.vercel.app")
                     .AllowAnyMethod()
                     .AllowAnyHeader()
                     .AllowCredentials();
