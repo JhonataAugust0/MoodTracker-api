@@ -25,7 +25,7 @@ builder.Configuration.AddEnvironmentVariables();
 builder.Configuration.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
 builder.Configuration.AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true);
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql("Host=moodtracker-db;Database=moodtrackerdb;Username=postgres;Password=postgres")
+    options.UseNpgsql(Environment.GetEnvironmentVariable("CONNECTION_STRING"))
         .LogTo(Console.WriteLine, LogLevel.Information)
         .EnableSensitiveDataLogging());
 
