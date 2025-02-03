@@ -104,10 +104,10 @@ builder.Services.AddSignalR();
 builder.WebHost.ConfigureKestrel(options =>
 {
     options.ListenAnyIP(5000);
-    options.ListenAnyIP(5001, listenOptions =>
-        {
-            listenOptions.UseHttps();
-        });
+    // options.ListenAnyIP(5001, listenOptions =>
+    //     {
+    //         listenOptions.UseHttps();
+    //     });
 });
 
 var app = builder.Build();
@@ -148,7 +148,7 @@ app.UseMiddleware<AuthMiddleware>();
 app.UseMiddleware<ErrorHandlingMiddleware>();
 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "MoodTracker API v1.0"));
 app.MapHub<NotificationHub>("/notificationHub");
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
 app.MapHealthChecks("/health");
 app.UseRouting();
 app.UseAuthentication();
