@@ -42,7 +42,10 @@ builder.Services.AddSingleton(new EmailSettings()
 builder.Services.AddSingleton<IConnectionMultiplexer>(
     ConnectionMultiplexer.Connect(
         new ConfigurationOptions{
-            EndPoints= { {Environment.GetEnvironmentVariable("REDIS_ENDPOINT"), int.Parse(Environment.GetEnvironmentVariable("REDIS_PORT") ?? "6379")} },
+            EndPoints= {{
+                Environment.GetEnvironmentVariable("REDIS_ENDPOINT"), 
+                int.Parse(Environment.GetEnvironmentVariable("REDIS_PORT"))
+            }},
             User=Environment.GetEnvironmentVariable("REDIS_USER"),
             Password=Environment.GetEnvironmentVariable("REDIS_PASSWORD")
         }
@@ -85,10 +88,7 @@ builder.Services.AddControllers();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddHealthChecks()
-    .AddDbContextCheck<ApplicationDbContext>()
-    .AddRedis(Environment.GetEnvironmentVariable("REDIS_CONNECTION_STRING"), 
-        name: "redis", 
-        failureStatus: HealthStatus.Unhealthy);
+    .AddDbContextCheck<ApplicationDbContext>();
 
 builder.Services.AddCustomCors();
 builder.Services.AddCustomServices();
