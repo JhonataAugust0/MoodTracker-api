@@ -53,7 +53,7 @@ namespace MoodTracker_back.Presentation.Api.V1.Controllers
             }
         }
 
-        [HttpPost]
+        [HttpPost,HttpOptions]
         public async Task<ActionResult<QuickNoteDto>> CreateNote([FromBody] CreateQuickNoteDto createQuickNoteDto)
         {
             try

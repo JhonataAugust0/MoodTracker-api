@@ -19,7 +19,7 @@ namespace MoodTracker_back.Presentation.Api.V1.Controllers
       _currentUserService = currentUserService;
     }
 
-    [HttpPost]
+    [HttpPost,HttpOptions]
     public async Task<IActionResult> Register([FromBody] RegisterRequestDTO request)
     {
       try

@@ -18,7 +18,7 @@ namespace MoodTracker_back.Presentation.Api.V1.Controllers
             _emailService = emailService;
         }
         
-        [HttpPost("login")]
+        [HttpPost("login"), HttpOptions("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequestDTO request)
         {
             try
@@ -39,7 +39,7 @@ namespace MoodTracker_back.Presentation.Api.V1.Controllers
         }
         
         [Authorize]
-        [HttpPost("refresh-token")]
+        [HttpPost("refresh-token"), HttpOptions("refresh-token")]
         public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
         {
             try
