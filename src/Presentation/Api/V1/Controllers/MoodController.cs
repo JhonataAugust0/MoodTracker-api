@@ -69,7 +69,7 @@ namespace MoodTracker_back.Presentation.Api.V1.Controllers
             }
         }
 
-        [HttpPost]
+        [HttpPost, HttpOptions]
         public async Task<ActionResult<MoodDto>> CreateMood(CreateMoodDto createMoodDto)
         {
             try
