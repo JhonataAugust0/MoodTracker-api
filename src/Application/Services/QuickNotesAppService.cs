@@ -80,7 +80,7 @@ namespace MoodTracker_back.Application.Services
                     UpdatedAt = DateTimeOffset.UtcNow
                 };
 
-                if (createQuickNoteDto.TagIds != null && createQuickNoteDto.TagIds.Any())
+                if (createQuickNoteDto.TagIds.Any())
                 {
                     var tags = await _tagRepository.GetByIdsAsync(createQuickNoteDto.TagIds);
                     foreach (var tag in tags.Where(t => t.UserId == userId))
