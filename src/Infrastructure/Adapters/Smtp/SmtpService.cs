@@ -163,7 +163,7 @@ public class SmtpService : IEmailService
                         <p>Olá,</p>
                         <p>Detectamos um acesso à sua conta no <strong>MoodTracker</strong> em ""{DateTime.UtcNow.ToString("dd/MM/yyyy HH:mm")}"". Se foi você que acessou, não é necessário realizar nenhuma ação.</p>
                         <p>Caso não tenha sido você, recomendamos que altere sua senha imediatamente para garantir a segurança da sua conta.</p>
-                        <a href=""http://localhost:5173/change-password"" style=""color: black"" class=""btn"">Alterar Senha</a>
+                        <a href=""{Environment.GetEnvironmentVariable("WEB_APP_URL")+"/change-password"}"" style=""color: black"" class=""btn"">Alterar Senha</a>
                         <p>Se precisar de ajuda ou tiver dúvidas, entre em contato conosco.</p>
                     </div>
                     <div class=""footer"">

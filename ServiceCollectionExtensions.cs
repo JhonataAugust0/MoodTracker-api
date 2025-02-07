@@ -122,7 +122,7 @@ public static class ServiceCollectionExtensions
         {
             options.AddPolicy("AllowFrontend", policy =>
             {
-                policy.WithOrigins("https://mood-tracker-front.vercel.app")
+                policy.WithOrigins(Environment.GetEnvironmentVariable("WEB_APP_URL"))
                     .AllowAnyMethod()
                     .AllowAnyHeader()
                     .AllowCredentials();
