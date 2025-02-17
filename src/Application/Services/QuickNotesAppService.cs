@@ -3,10 +3,6 @@ using MoodTracker_back.Application.Interfaces;
 using MoodTracker_back.Domain.Exceptions;
 using MoodTracker_back.Domain.Interfaces;
 using MoodTracker_back.Presentation.Api.V1.Dtos;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace MoodTracker_back.Application.Services
 {
@@ -14,15 +10,18 @@ namespace MoodTracker_back.Application.Services
     {
         private readonly IQuickNoteRepository _notesRepository;
         private readonly ITagRepository _tagRepository;
+        private readonly ICryptographService _cryptographService;
         private readonly ILoggingService _logger;
 
         public QuickNotesAppService(
             IQuickNoteRepository notesRepository, 
             ITagRepository tagRepository,
+            ICryptographService cryptographService,
             ILoggingService logger)
         {
             _notesRepository = notesRepository ?? throw new ArgumentNullException(nameof(notesRepository));
             _tagRepository = tagRepository ?? throw new ArgumentNullException(nameof(tagRepository));
+            _cryptographService = cryptographService ?? throw new ArgumentNullException(nameof(cryptographService));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
         
@@ -74,7 +73,7 @@ namespace MoodTracker_back.Application.Services
                 var note = new QuickNote()
                 {
                     UserId = userId,
-                    Content = createQuickNoteDto.Content,
+                    Content = _cryptographService.Encrypt(createQuickNoteDto.Content),
                     IsDeleted = false,
                     CreatedAt = DateTimeOffset.UtcNow,
                     UpdatedAt = DateTimeOffset.UtcNow
@@ -164,13 +163,13 @@ namespace MoodTracker_back.Application.Services
             }
         }
         
-        private static QuickNoteDto MapToDto(QuickNote noteBase)
+        private QuickNoteDto MapToDto(QuickNote noteBase)
         {
             return new QuickNoteDto
             {
                 Id = noteBase.Id,
                 UserId = noteBase.UserId,
-                Content = noteBase.Content,
+                Content = _cryptographService.Decrypt(noteBase.Content),
                 CreatedAt = noteBase.CreatedAt,
                 UpdatedAt = noteBase.UpdatedAt,
                 IsDeleted = noteBase.IsDeleted,

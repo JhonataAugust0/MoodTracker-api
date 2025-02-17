@@ -12,20 +12,24 @@ namespace MoodTracker_back.Application.Services
         private readonly IHabitRepository _habitRepository;
         private readonly IHabitCompletionRepository _habitCompletionRepository;
         private readonly ITagRepository _tagRepository;
+        private readonly ICryptographService _cryptographService;
         private readonly ILoggingService _logger;
 
         public HabitAppService(
             IHabitRepository habitRepository,
             ITagRepository tagRepository,
             IHabitCompletionRepository habitCompletionRepository,
+            ICryptographService cryptographService,
             ILoggingService logger)
         {
             _habitRepository = habitRepository ?? throw new ArgumentNullException(nameof(habitRepository));
-            _habitCompletionRepository = habitCompletionRepository ?? throw new ArgumentNullException(nameof(habitCompletionRepository));
+            _habitCompletionRepository = habitCompletionRepository ??
+                                         throw new ArgumentNullException(nameof(habitCompletionRepository));
             _tagRepository = tagRepository ?? throw new ArgumentNullException(nameof(tagRepository));
+            _cryptographService = cryptographService ?? throw new ArgumentNullException(nameof(cryptographService));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
-        
+
         public async Task<HabitDto> GetByIdAsync(int id, int userId)
         {
             try
@@ -42,8 +46,10 @@ namespace MoodTracker_back.Application.Services
             }
             catch (Exception ex)
             {
-                await _logger.LogErrorAsync(ex, "Erro ao recuperar o hábito com ID {HabitId} para o usuário {UserId}", id, userId);
-                throw new ApplicationException("Erro ao recuperar o hábito. Por favor, tente novamente mais tarde.", ex);
+                await _logger.LogErrorAsync(ex, "Erro ao recuperar o hábito com ID {HabitId} para o usuário {UserId}",
+                    id, userId);
+                throw new ApplicationException("Erro ao recuperar o hábito. Por favor, tente novamente mais tarde.",
+                    ex);
             }
         }
 
@@ -60,7 +66,7 @@ namespace MoodTracker_back.Application.Services
                 throw new ApplicationException("Erro ao recuperar hábitos. Tente novamente mais tarde.", ex);
             }
         }
-        
+
         public async Task<IEnumerable<HabitCompletion>> GetUserHistoryHabitCompletionAsync(
             int habitId, DateTimeOffset? startDate = null, DateTimeOffset? endDate = null)
         {
@@ -69,13 +75,16 @@ namespace MoodTracker_back.Application.Services
 
             try
             {
-                var history = await _habitCompletionRepository.GetUserHistoryHabitCompletionAsync(habitId, startDate, endDate);
+                var history =
+                    await _habitCompletionRepository.GetUserHistoryHabitCompletionAsync(habitId, startDate, endDate);
                 return history;
             }
             catch (Exception ex)
             {
-                await _logger.LogErrorAsync(ex, "Erro ao recuperar o histórico de conclusão do hábito de ID {HabitId}", habitId);
-                throw new ApplicationException("Erro ao recuperar o histórico de conclusão do hábito. Por favor, tente novamente mais tarde.", ex);
+                await _logger.LogErrorAsync(ex, "Erro ao recuperar o histórico de conclusão do hábito de ID {HabitId}",
+                    habitId);
+                throw new ApplicationException(
+                    "Erro ao recuperar o histórico de conclusão do hábito. Por favor, tente novamente mais tarde.", ex);
             }
         }
 
@@ -91,8 +100,8 @@ namespace MoodTracker_back.Application.Services
                 var habit = new Habit
                 {
                     UserId = userId,
-                    Name = createHabitDto.Name,
-                    Description = createHabitDto.Description,
+                    Name = _cryptographService.Encrypt(createHabitDto.Name),
+                    Description = _cryptographService.Encrypt(createHabitDto.Description ?? ""),
                     CreatedAt = createHabitDto.CreatedAt ?? DateTimeOffset.UtcNow,
                     UpdatedAt = createHabitDto.CreatedAt ?? DateTimeOffset.UtcNow,
                     IsActive = createHabitDto.IsActive ?? true,
@@ -119,7 +128,7 @@ namespace MoodTracker_back.Application.Services
                 throw new ApplicationException("Erro ao criar hábito. Por favor, tente novamente mais tarde.", ex);
             }
         }
-        
+
         public async Task<HabitCompletionDto> LogHabitAsync(int userId, LogHabitCompletionDto habitCompletionDto)
         {
             if (habitCompletionDto == null)
@@ -155,11 +164,14 @@ namespace MoodTracker_back.Application.Services
             }
             catch (Exception ex)
             {
-                await _logger.LogErrorAsync(ex, "Erro ao registrar a conclusão do hábito de ID {HabitId} do usuário de ID {UserId}", habitCompletionDto.HabitId, userId);
-                throw new ApplicationException("Erro ao registrar a conclusão do hábito. Por favor, tente novamente mais tarde.", ex);
+                await _logger.LogErrorAsync(ex,
+                    "Erro ao registrar a conclusão do hábito de ID {HabitId} do usuário de ID {UserId}",
+                    habitCompletionDto.HabitId, userId);
+                throw new ApplicationException(
+                    "Erro ao registrar a conclusão do hábito. Por favor, tente novamente mais tarde.", ex);
             }
         }
-        
+
         public async Task<HabitDto> UpdateHabitAsync(int id, int userId, UpdateHabitDto updateHabitDto)
         {
             if (updateHabitDto == null)
@@ -200,7 +212,8 @@ namespace MoodTracker_back.Application.Services
             }
             catch (Exception ex)
             {
-                await _logger.LogErrorAsync(ex, "Erro ao atualizar hábito de ID {HabitId} do usuário de ID {UserId}", id, userId);
+                await _logger.LogErrorAsync(ex, "Erro ao atualizar hábito de ID {HabitId} do usuário de ID {UserId}",
+                    id, userId);
                 throw new ApplicationException("Erro ao atualizar hábito. Tente novamente mais tarde.", ex);
             }
         }
@@ -221,19 +234,20 @@ namespace MoodTracker_back.Application.Services
             }
             catch (Exception ex)
             {
-                await _logger.LogErrorAsync(ex, "Erro ao deletar hábito de ID {HabitId} do usuário de ID {UserId}", id, userId);
+                await _logger.LogErrorAsync(ex, "Erro ao deletar hábito de ID {HabitId} do usuário de ID {UserId}", id,
+                    userId);
                 throw new ApplicationException("Erro ao deletar hábito. Tente novamente mais tarde.", ex);
             }
         }
 
-        private static HabitDto MapToDto(Habit habit)
+        private HabitDto MapToDto(Habit habit)
         {
             return new HabitDto
             {
                 Id = habit.Id,
                 UserId = habit.UserId,
-                Name = habit.Name,
-                Description = habit.Description,
+                Name = _cryptographService.Decrypt(habit.Name),
+                Description = _cryptographService.Decrypt(habit.Description ?? ""),
                 CreatedAt = habit.CreatedAt,
                 UpdatedAt = habit.UpdatedAt,
                 IsActive = habit.IsActive,

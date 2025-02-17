@@ -12,17 +12,20 @@ namespace MoodTracker_back.Application.Services
         private readonly IMoodRepository _moodRepository;
         private readonly ITagRepository _tagRepository;
         private readonly IUserService _userService;
+        private readonly ICryptographService _cryptographService;
         private readonly ILoggingService _logger;
 
         public MoodAppService(
             IMoodRepository moodRepository, 
             ITagRepository tagRepository, 
             IUserService userService,
+            ICryptographService cryptographService,
             ILoggingService logger)
         {
             _moodRepository = moodRepository ?? throw new ArgumentNullException(nameof(moodRepository));
             _tagRepository = tagRepository ?? throw new ArgumentNullException(nameof(tagRepository));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
+            _cryptographService = cryptographService ?? throw new ArgumentNullException(nameof(cryptographService));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
         
@@ -88,9 +91,9 @@ namespace MoodTracker_back.Application.Services
                 var mood = new Mood()
                 {
                     UserId = userId,
-                    MoodType = createMoodDto.MoodType,
+                    MoodType = _cryptographService.Encrypt(createMoodDto.MoodType),
                     Intensity = createMoodDto.Intensity,
-                    Notes = createMoodDto.Notes,
+                    Notes = _cryptographService.Encrypt(createMoodDto.Notes ?? ""),
                     Timestamp = createMoodDto.Timestamp ?? DateTimeOffset.UtcNow,
                 };
 
@@ -193,14 +196,14 @@ namespace MoodTracker_back.Application.Services
             }
         }
 
-        private static MoodDto MapToDto(Mood moodBase)
+        private MoodDto MapToDto(Mood moodBase)
         {
             return new MoodDto
             {
                 Id = moodBase.Id,
-                MoodType = moodBase.MoodType,
+                MoodType = _cryptographService.Decrypt(moodBase.MoodType),
                 Intensity = moodBase.Intensity,
-                Notes = moodBase.Notes,
+                Notes = _cryptographService.Decrypt(moodBase.Notes ?? ""),
                 Timestamp = moodBase.Timestamp,
                 TagIds = moodBase.Tags.Select(t => t.Id).ToList()
             };
