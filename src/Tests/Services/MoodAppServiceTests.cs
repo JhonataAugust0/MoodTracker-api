@@ -15,13 +15,14 @@ namespace MoodTracker_back.Tests.Services
         private readonly Mock<IMoodRepository> _moodRepoMock = new();
         private readonly Mock<ITagRepository> _tagRepoMock = new();
         private readonly Mock<IUserService> _userServiceMock = new();
+        private readonly Mock<ICryptographService> _cryptoServiceMock = new();
         private readonly Mock<ILoggingService> _loggerMock = new();
         private readonly MoodAppService _service;
 
         public MoodAppServiceTests()
         {
             _service = new MoodAppService(_moodRepoMock.Object, _tagRepoMock.Object, 
-                _userServiceMock.Object, _loggerMock.Object);
+                _userServiceMock.Object, _cryptoServiceMock.Object, _loggerMock.Object);
         }
 
         [Fact]

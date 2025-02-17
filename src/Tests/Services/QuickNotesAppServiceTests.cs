@@ -15,12 +15,13 @@ namespace MoodTracker_back.Tests.Services
     {
         private readonly Mock<IQuickNoteRepository> _noteRepoMock = new();
         private readonly Mock<ITagRepository> _tagRepoMock = new();
+        private readonly Mock<ICryptographService> _cryptoServiceMock = new();
         private readonly Mock<ILoggingService> _loggerMock = new();
         private readonly QuickNotesAppService _service;
 
         public QuickNotesAppServiceTests()
         {
-            _service = new QuickNotesAppService(_noteRepoMock.Object, _tagRepoMock.Object, _loggerMock.Object);
+            _service = new QuickNotesAppService(_noteRepoMock.Object, _tagRepoMock.Object, _cryptoServiceMock.Object, _loggerMock.Object);
         }
 
         [Fact]

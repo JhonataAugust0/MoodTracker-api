@@ -8,7 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 using MoodTracker_back.Application.Dtos;
 using MoodTracker_back.Application.Interfaces;
 
-namespace MoodTracker_back.Infrastructure.Adapters;
+namespace MoodTracker_back.Infrastructure.Adapters.Security;
 
 public class TokenService : ITokenService
 {

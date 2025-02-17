@@ -29,6 +29,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IUserRepository, UserRepository>(); 
         services.AddScoped<IPasswordService, PasswordService>();
         services.AddScoped<IHabitRepository, HabitRepository>();
+        services.AddScoped<ICryptographService, CryptographService>();
         services.AddScoped<IQuickNotesService, QuickNotesAppService>();
         services.AddScoped<ICurrentUserService, CurrentUserAppService>();
         services.AddScoped<IQuickNoteRepository, QuickNotesRepository>();
