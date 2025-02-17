@@ -115,3 +115,12 @@ Abra um Pull Request!
 Distribuído sob licença CC BY-NC-SA 4.0. Veja LICENSE para detalhes. 
 <br>
 [![CC BY-NC-SA 4.0](https://licensebuttons.net/l/by-nc-sa/4.0/88x31.png)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
+
+
+   
+# Notas de atualização v1.1.0
+Foi implementado um novo serviço de criptografia intermediário na camada de aplicação do sistema. Agora, todos os dados sensíveis (como humor, notas de humor, anotações rápidas e hábitos) são criptografados em repouso. Dessa forma, mesmo que terceiros obtenham acesso ao banco de dados, as informações dos usuários permanecerão protegidas. As adições incluem:
+
+- Uso de um serviço de criptografia (AES) para criptografar dados antes de salvá-los no banco.
+- Descriptografia automática no momento da leitura, garantindo que apenas o usuário autenticado visualize seus dados em texto legível.
+- Configuração de chaves de criptografia por meio de variáveis de ambiente, maximizando a segurança sem expor segredos no código.
