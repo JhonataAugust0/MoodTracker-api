@@ -113,7 +113,7 @@ namespace MoodTracker_back.Application.Services
 
                 if (!string.IsNullOrWhiteSpace(updateQuickNoteDto.Content))
                 {
-                    note.Content = updateQuickNoteDto.Content;
+                    note.Content = _cryptographService.Encrypt(updateQuickNoteDto.Content);
                     note.UpdatedAt = DateTimeOffset.UtcNow;
                 }
 
