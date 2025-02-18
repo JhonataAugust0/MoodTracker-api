@@ -142,13 +142,13 @@ namespace MoodTracker_back.Application.Services
                     throw new NotFoundException("Mood not found");
 
                 if (!string.IsNullOrWhiteSpace(updateMoodDto.MoodType))
-                    mood.MoodType = updateMoodDto.MoodType;
+                    mood.MoodType = _cryptographService.Encrypt(updateMoodDto.MoodType);
                 
                 if (updateMoodDto.Intensity.HasValue)
                     mood.Intensity = updateMoodDto.Intensity.Value;
                 
                 if (updateMoodDto.Notes != null)
-                    mood.Notes = updateMoodDto.Notes;
+                    mood.Notes = _cryptographService.Encrypt(updateMoodDto.Notes);
 
                 if (updateMoodDto.TagIds != null)
                 {

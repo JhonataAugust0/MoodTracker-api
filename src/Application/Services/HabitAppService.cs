@@ -144,7 +144,7 @@ namespace MoodTracker_back.Application.Services
                 {
                     HabitId = habit.Id,
                     CompletedAt = habitCompletionDto.CompletedAt,
-                    Notes = habitCompletionDto.Notes,
+                    Notes = _cryptographService.Encrypt(habitCompletionDto.Notes),
                     CreatedAt = DateTimeOffset.UtcNow
                 };
 
@@ -155,7 +155,7 @@ namespace MoodTracker_back.Application.Services
                     Id = habitCompletion.Id,
                     HabitId = habitCompletion.HabitId,
                     CompletedAt = habitCompletion.CompletedAt,
-                    Notes = habitCompletion.Notes,
+                    Notes = _cryptographService.Decrypt(habitCompletion.Notes),
                 };
             }
             catch (NotFoundException)
@@ -184,10 +184,10 @@ namespace MoodTracker_back.Application.Services
                     throw new NotFoundException("Habit not found");
 
                 if (!string.IsNullOrWhiteSpace(updateHabitDto.Name))
-                    habit.Name = updateHabitDto.Name;
+                    habit.Name = _cryptographService.Encrypt(updateHabitDto.Name);
 
                 if (!string.IsNullOrWhiteSpace(updateHabitDto.Description))
-                    habit.Description = updateHabitDto.Description;
+                    habit.Description = _cryptographService.Encrypt(updateHabitDto.Description);
 
                 if (updateHabitDto.IsActive.HasValue)
                     habit.IsActive = updateHabitDto.IsActive.Value;
