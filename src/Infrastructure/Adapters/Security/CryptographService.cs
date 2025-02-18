@@ -65,11 +65,17 @@ public class CryptographService : ICryptographService
 
     public string Decrypt(string ciphertext)
     {
-        if (string.IsNullOrEmpty(ciphertext))
-            throw new ArgumentException("O texto para descriptografar é nulo ou vazio.", nameof(ciphertext));
-
+        if (string.IsNullOrWhiteSpace(ciphertext) || 
+            ciphertext.Length % 4 != 0 || 
+            ciphertext.Any(c => !Base64Chars.Contains(c)))
+        {
+            throw new ArgumentException("Texto criptografado inválido.");
+        }
         try
         {
+            if (!IsBase64String(ciphertext))
+                throw new FormatException("O texto criptografado não é um Base64 válido.");
+
             using var aes = Aes.Create();
             aes.Key = _key;
             aes.IV = _iv;
@@ -82,8 +88,18 @@ public class CryptographService : ICryptographService
         }
         catch (Exception ex)
         {
-            _logger?.LogErrorAsync(ex, "Erro ao descriptografar texto.");
+            _logger.LogErrorAsync(ex, "Erro ao descriptografar texto.");
             throw new ArgumentException("Falha ao descriptografar os dados.", ex);
         }
+    }
+  
+    private static readonly HashSet<char> Base64Chars = new HashSet<char>(
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/="
+    );
+
+    private static bool IsBase64String(string base64)
+    {
+        Span<byte> buffer = new Span<byte>(new byte[base64.Length]);
+        return Convert.TryFromBase64String(base64, buffer, out _);
     }
 }
